@@ -4,19 +4,23 @@ Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Na
 
 ## Overview and data
 
-The following repository contains codes to 1) predict minimum sample sizes required based on spatial biologging data, and 2) to reproduce analyses and figures from the paper, submitted to Conservation Biology. 
+The following repository contains codes to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
 
 ## Codes
 
-The codes are laid out in two sections: 
+The codes are laid out into three sections: 
 
 ### 1) Predicting minimum sample sizes required based on spatial biologging data
 
+**X.r**: This comprises code 
 
+### 2) Reproducing analyses from the paper
 
-### 2) Reproducing analyses and figures from the paper
+**2a_geolocator_validation_filtering.r**: This comprises code to run an equinox filter that removes positions 15 days either side of the equinoxes, a latitudinal filter to remove extreme latitudinal outliers (positions south of 70°S or north of the equator), and a speed filter that removes positions that would require unrealistic flight speeds.
 
+### 3) Reproducing code from the paper
 
+**3_X.r**: This comprises code 
 
 ## Data (please read before using)
 
