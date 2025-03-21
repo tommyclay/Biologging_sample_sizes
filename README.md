@@ -18,7 +18,7 @@ The codes are laid out into three sections:
 
 **2a_geolocator_validation_filtering.r**: This comprises code to run an equinox filter that removes positions 15 days either side of the equinoxes, a latitudinal filter to remove extreme latitudinal outliers (positions south of 70°S or north of the equator), and a speed filter that removes positions that would require unrealistic flight speeds.
 
-### 3) Reproducing code from the paper
+### 3) Reproducing figures from the paper
 
 **3_X.r**: This comprises code 
 
