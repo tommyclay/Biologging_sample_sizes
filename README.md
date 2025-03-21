@@ -6,7 +6,19 @@ Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Na
 
 The following repository contains codes to 1) predict minimum sample sizes required based on spatial biologging data, and 2) to reproduce analyses and figures from the paper, submitted to Conservation Biology. 
 
-## General statement (please read before using data)
+## Codes
+
+The codes are laid out in two sections: 
+
+### 1) Predicting minimum sample sizes required based on spatial biologging data
+
+
+
+### 2) Reproducing analyses and figures from the paper
+
+
+
+## Data (please read before using)
 
 The attached archived file(s) contain data derived from long-term tracking projects on albatrosses and petrels at Bird Island (South Georgia). This is a request to please let us know if you use them.  Several people have made extensive efforts overseeing the data collection for the last 25+ years. If you plan to analyse the data, there are a number of reasons why it would be very helpful if you could contact Richard Phillips (raphil@bas.ac.uk) before doing so: 
 
@@ -17,14 +29,7 @@ The attached archived file(s) contain data derived from long-term tracking proje
 
 If you are interested in analysing the detailed project data in any depth, you may find it helpful to have access to the full database rather than the files available here.  If so, we are always open to further collaboration.
 
-## Data
-
 Example dataset 
 
-## Codes
-
-The codes are laid out in two sections: 
-1) Predicting minimum sample sizes required based on spatial biologging data
-2) Reproducing analyses and figures from the paper
 
 
