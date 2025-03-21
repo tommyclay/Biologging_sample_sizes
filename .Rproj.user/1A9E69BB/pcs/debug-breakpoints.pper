@@ -1,0 +1,21 @@
+{
+    "debugBreakpointsState": {
+        "breakpoints": [
+            {
+                "id": 0,
+                "path": "C:/Users/44753/Documents/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/1a_resampling_predicting_sample_sizes.R",
+                "line_number": 145,
+                "function_steps": "",
+                "function_name": "run_asymptotic_model2",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 145,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
+    }
+}
