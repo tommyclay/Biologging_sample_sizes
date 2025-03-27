@@ -22,7 +22,7 @@ The codes are laid out into three sections:
 
 **3_X.r**: This comprises code 
 
-## Data (please read before using)
+## Data use statement (please read before using)
 
 The attached archived file(s) contain data derived from long-term tracking projects on albatrosses and petrels at Bird Island (South Georgia). This is a request to please let us know if you use them.  Several people have made extensive efforts overseeing the data collection for the last 25+ years. If you plan to analyse the data, there are a number of reasons why it would be very helpful if you could contact Richard Phillips (raphil@bas.ac.uk) before doing so: 
 
