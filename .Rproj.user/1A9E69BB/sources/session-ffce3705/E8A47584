@@ -1,0 +1,24 @@
+{
+    "id": "E8A47584",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/2_reproducing_analyses/2e_calculate_among_individual_overlap.R",
+    "project_path": "Codes/2_reproducing_analyses/2e_calculate_among_individual_overlap.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1743028032356.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1742580608,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1742580608,
+    "read_only": false,
+    "read_only_alternatives": []
+}

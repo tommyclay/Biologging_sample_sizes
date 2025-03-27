@@ -1,0 +1,83 @@
+Family,Species,Breed_stage,BA
+Alcidae,Alca torda,incubation,0.56
+Alcidae,Alca torda,chick-rearing,0.65
+Alcidae,Alca torda,unspec. breeding,0.76
+Alcidae,Cepphus grylle,chick-rearing,0.6
+Alcidae,Fratercula arctica,chick-rearing,0.59
+Alcidae,Uria aalge,incubation,0.41
+Alcidae,Uria aalge,chick-rearing,0.48
+Alcidae,Uria aalge,unspec. breeding,0.45
+Diomedeidae,Diomedea dabbenena,incubation,0.1
+Diomedeidae,Diomedea dabbenena,chick-rearing,0.11
+Diomedeidae,Diomedea exulans,incubation,0.22
+Diomedeidae,Diomedea exulans,chick-rearing,0.21
+Diomedeidae,Phoebetria fusca,incubation,0.22
+Diomedeidae,Phoebetria fusca,unspec. breeding,0.25
+Diomedeidae,Thalassarche chlororhynchos,incubation,0.29
+Diomedeidae,Thalassarche chrysostoma,incubation,0.06
+Diomedeidae,Thalassarche chrysostoma,chick-rearing,0.11
+Diomedeidae,Thalassarche melanophris,incubation,0.25
+Diomedeidae,Thalassarche melanophris,chick-rearing,0.4
+Fregatidae,Fregata aquila,incubation,0.12
+Fregatidae,Fregata aquila,chick-rearing,0.25
+Fregatidae,Fregata magnificens,chick-rearing,0.34
+Hydrobatidae,Hydrobates castro,incubation,0.19
+Hydrobatidae,Hydrobates leucorhous,incubation,0.31
+Hydrobatidae,Hydrobates leucorhous,chick-rearing,0.34
+Hydrobatidae,Hydrobates pelagicus,incubation,0.65
+Hydrobatidae,Hydrobates pelagicus,chick-rearing,0.67
+Laridae,Anous stolidus,incubation,0.54
+Laridae,Hydroprogne caspia,incubation,0.67
+Laridae,Larus scoresbii,unspec. breeding,0.71
+Laridae,Onychoprion fuscatus,chick-rearing,0.57
+Laridae,Rissa tridactyla,incubation,0.39
+Laridae,Rissa tridactyla,chick-rearing,0.49
+Laridae,Rissa tridactyla,unspec. breeding,0.6
+Laridae,Thalasseus maximus,incubation,0.68
+Phaethontidae,Phaethon aethereus,incubation,0.25
+Phaethontidae,Phaethon aethereus,chick-rearing,0.32
+Phaethontidae,Phaethon lepturus,chick-rearing,0.32
+Phalacrocoracidae,Phalacrocorax aristotelis,incubation,0.83
+Phalacrocoracidae,Phalacrocorax aristotelis,chick-rearing,0.8
+Phalacrocoracidae,Phalacrocorax aristotelis,unspec. breeding,0.76
+Phalacrocoracidae,Phalacrocorax atriceps,chick-rearing,0.46
+Phalacrocoracidae,Phalacrocorax atriceps,unspec. breeding,0.43
+Phalacrocoracidae,Phalacrocorax magellanicus,chick-rearing,0.93
+Procellariidae,Ardenna gravis,incubation,0.14
+Procellariidae,Bulweria bulwerii,chick-rearing,0.59
+Procellariidae,Calonectris borealis,incubation,0.12
+Procellariidae,Calonectris borealis,chick-rearing,0.18
+Procellariidae,Calonectris diomedea,incubation,0.22
+Procellariidae,Calonectris diomedea,chick-rearing,0.38
+Procellariidae,Calonectris edwardsii,incubation,0.28
+Procellariidae,Calonectris edwardsii,unspec. breeding,0.34
+Procellariidae,Fulmarus glacialis,chick-rearing,0.43
+Procellariidae,Fulmarus glacialoides,unspec. breeding,0.65
+Procellariidae,Macronectes giganteus,incubation,0.07
+Procellariidae,Macronectes halli,incubation,0.09
+Procellariidae,Procellaria aequinoctialis,unspec. breeding,0.13
+Procellariidae,Procellaria cinerea,incubation,0.13
+Procellariidae,Pterodroma feae,chick-rearing,0.28
+Procellariidae,Puffinus boydi,incubation,0.25
+Procellariidae,Puffinus puffinus,incubation,0.31
+Procellariidae,Puffinus puffinus,chick-rearing,0.39
+Procellariidae,Puffinus yelkouan,chick-rearing,0.3
+Procellariidae,Thalassoica antarctica,unspec. breeding,0.62
+Spheniscidae,Aptenodytes patagonicus,incubation,0.32
+Spheniscidae,Aptenodytes patagonicus,chick-rearing,0.46
+Spheniscidae,Eudyptes chrysocome,incubation,0.42
+Spheniscidae,Eudyptes chrysocome,chick-rearing,0.38
+Spheniscidae,Eudyptes chrysocome,unspec. breeding,0.37
+Spheniscidae,Eudyptes chrysolophus,incubation,0.33
+Spheniscidae,Eudyptes chrysolophus,chick-rearing,0.53
+Spheniscidae,Pygoscelis adeliae,incubation,0.15
+Spheniscidae,Pygoscelis adeliae,chick-rearing,0.39
+Spheniscidae,Pygoscelis antarcticus,chick-rearing,0.75
+Spheniscidae,Pygoscelis papua,chick-rearing,0.78
+Spheniscidae,Spheniscus magellanicus,chick-rearing,0.74
+Spheniscidae,Spheniscus magellanicus,unspec. breeding,0.26
+Sulidae,Morus bassanus,chick-rearing,0.25
+Sulidae,Sula dactylatra,incubation,0.32
+Sulidae,Sula dactylatra,chick-rearing,0.51
+Sulidae,Sula leucogaster,chick-rearing,0.72
+Sulidae,Sula leucogaster,unspec. breeding,0.95

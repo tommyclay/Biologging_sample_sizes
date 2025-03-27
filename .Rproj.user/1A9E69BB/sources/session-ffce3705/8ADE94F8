@@ -1,0 +1,26 @@
+{
+    "id": "8ADE94F8",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/2_reproducing_analyses/2b_resampling_birdlife_predicting_sample_sizes.R",
+    "project_path": "Codes/2_reproducing_analyses/2b_resampling_birdlife_predicting_sample_sizes.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1743028388994.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "55,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1743095378,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743095378852,
+    "read_only": false,
+    "read_only_alternatives": []
+}

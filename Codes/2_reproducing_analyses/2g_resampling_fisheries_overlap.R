@@ -1,0 +1,227 @@
+library(plyr)
+library(raster)
+library(terra)
+#library(ks)
+library(progress)
+library(future.apply)
+library(raster)
+library(sf)
+library(adehabitatHR)
+library(future.apply)
+
+# function to resample home range area with sample size
+resampling_fisheries_overlap <- function(x, n_iter, UD_cell, UD_h, threat_df, grid_res, n_cores, proj_dec, proj_utm) {
+  
+  # Start timing
+  start_time <- Sys.time()
+  # 1. DATA PROCESSING
+  
+  # converting fishing effort data to raster grid
+  coordinates(threat_df) <- ~longitude + latitude
+  proj4string(threat_df) <- proj_dec
+  ext <- extent(-180, 180, -90, 90) 
+  threat_r <- raster(ext, res = grid_res)
+  threat_r <- rasterize(threat_df, threat_r, field = "value")
+  threat_r[is.na(threat_r)] <- 0
+  
+  # create empty grid to convert to kernels to 
+  world.grid <- expand.grid(longitude = seq(-179, 179, grid_res), latitude = seq(-89, 89, grid_res))
+  world.grid2 <- world.grid 
+  coordinates(world.grid2) <- ~longitude + latitude
+  gridded(world.grid2) <- TRUE
+  world_r <- raster(world.grid2)
+  proj4string(world_r) <- proj_dec
+  
+  # just taking the ID and longitude and latitude
+  x <- x[, c("longitude", "latitude", "id")]
+  # re-projecting points using sf
+  x_sf <- st_as_sf(x, coords = c("longitude", "latitude"))
+  st_crs(x_sf) <- proj_dec
+  if (proj_dec != proj_utm) {
+    x_sf <- st_transform(x_sf, crs = proj_utm)
+  }
+  coords <- st_coordinates(x_sf)
+  x_df <- cbind(st_drop_geometry(x_sf), coords)
+  names(x_df) <- c("id", "longitude", "latitude")
+  
+  # 1. SETTING UP NULL GRID - using buffer of 2 times the smoothing factor around min and max points 
+  null.grid <- expand.grid(x = seq(min(x_df$longitude) - (UD_h * 2), max(x_df$longitude) + (UD_h * 2), by = UD_cell),
+                           y = seq(min(x_df$latitude) - (UD_h * 2), max(x_df$latitude) + (UD_h * 2), by = UD_cell))
+  coordinates(null.grid) <- ~x + y
+  gridded(null.grid) <- TRUE
+  
+  # 2. CALCULATE KERNELS FOR EACH INDIVIDUAL AND TURN TO MATRICES (TO AVERAGE ACROSS LATER)
+  kern_in <- list()
+  matrix_in <- list()
+  n_ind <- length(unique(x_df$id))
+  for (j in 1:n_ind) {
+    id.sub <- subset(x_df, id == unique(x_df$id)[j])   
+    id.sub$id <- as.factor(as.character(id.sub$id))
+    lox <- id.sub[, c("longitude", "latitude")]
+    coordinates(lox) <- ~longitude + latitude
+    kern_in[[j]] <- adehabitatHR::kernelUD(lox, grid = null.grid, h = UD_h)
+    matrix_in[[j]] <- as.matrix(raster(kern_in[[j]]))
+  }
+  names(kern_in) <- unique(x_df$id)
+  names(matrix_in) <- unique(x_df$id)
+  
+  # Setting up parallel backend
+  plan(multisession, workers = n_cores)
+  
+  # Parallelized iterations
+  iter.summary <- future_lapply(
+    seq_len(n_iter),
+    function(i) { 
+      # Initialize lists and vectors for each iteration
+      kern_out <- list()
+      matrix_out <- list()
+      overlap_v <- numeric(n_ind)
+      o_change_v <- numeric(n_ind)
+      
+      # Randomize order of IDs
+      random.ids <- sample(unique(x_df$id), n_ind, replace = FALSE)
+      
+      # First level of sample size (N = 1)
+      matrix_out[[1]] <- matrix_in[[random.ids[1]]]
+      kern_out[[1]] <- kern_in[[random.ids[1]]]
+      
+      # Resample to desired resolution
+      r_out <- raster(kern_out[[1]])
+      proj4string(r_out) <- proj_utm
+      r_2 <- projectRaster(from = r_out, to = world_r)
+      c.factor <- 1 / sum(na.omit(values(r_2)))
+      values(r_2) <- values(r_2) * c.factor
+      
+      # Calculate overlap
+      threat_overlap <- overlay(r_2, threat_r, fun = "*")
+      overlap_df <- as.data.frame(threat_overlap, xy = TRUE)
+      names(overlap_df) <- c("longitude", "latitude", "overlap")
+      overlap_v[1] <- sum(na.omit(overlap_df$overlap))
+      o_change_v[1] <- NA
+      
+      # Subsequent levels of sample size (N = 2+)
+      for (a in 2:n_ind) { 
+        matrix_out[[a]] <- matrix_in[[random.ids[a]]]
+        matrix_sum <- Reduce('+', matrix_out) / a
+        
+        kern_out[[a]] <- kern_out[[1]]
+        kern_out[[a]]@data$ud <- as.vector(matrix_sum)
+        
+        r_out <- raster(kern_out[[a]])
+        proj4string(r_out) <- proj_utm
+        r_2 <- projectRaster(from = r_out, to = world_r)
+        c.factor <- 1 / sum(na.omit(values(r_2)))
+        values(r_2) <- values(r_2) * c.factor
+        
+        threat_overlap <- overlay(r_2, threat_r, fun = "*")
+        overlap_df <- as.data.frame(threat_overlap, xy = TRUE)
+        names(overlap_df) <- c("longitude", "latitude", "overlap")
+        overlap_v[a] <- sum(na.omit(overlap_df$overlap))
+        o_change_v[a] <- (overlap_v[a] - overlap_v[a - 1]) / overlap_v[a - 1] * 100
+      }
+      
+      data.frame(sample = seq_len(n_ind), overlap = overlap_v, o_change_p = o_change_v, iteration = i)
+    },
+    future.packages = c("adehabitatHR", "raster", "sp")  # <-- Pre-load packages
+  )
+  
+  # Combine all iteration summaries
+  all.iter <- do.call(rbind, iter.summary)
+  
+  # End timing
+  end_time <- Sys.time()
+  total_time <- end_time - start_time
+  message(paste0("Resampling completed in ", round(total_time, 2), " ", attr(total_time, "units")))
+  
+  return(all.iter)
+}
+
+#### GET RID OF FUTURE APPLY WARNING MESSAGE ####
+
+#### 1. LOAD IN FISHERIES DATA ####
+
+fish_df <- read.csv("./Data_inputs/fishing_effort/gfw_pll_effort_2_degrees.csv")
+
+#### 2. LOAD IN GEOLOCATOR DATA ####
+
+in_gls <- "./Data_inputs/gls_data/"
+bba <- read.csv(paste0(in_gls, "bba02.csv"))
+gha <- read.csv(paste0(in_gls, "gha1999.csv"))
+wa <- read.csv(paste0(in_gls, "waall.csv"))
+wcp <- read.csv(paste0(in_gls, "wcpboth.csv"))
+bba$id <- as.factor(as.character(bba$id))
+gha$id <- as.factor(as.character(gha$id))
+wa$id <- as.factor(as.character(wa$id))
+wcp$id <- as.factor(as.character(wcp$id))
+
+# utm centred around lon of colony and lat of south pole
+proj_utm <- paste0("+proj=laea +lat_0=", -90, " +lon_0=", -38.05, " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
+
+#### 3. RUNNING RESAMPLING PROCESS AND PASTING OUT ####
+
+out_direx <- "./Data_outputs/resampled_fisheries_overlap_outputs/"
+
+##### 3A. BBA ######
+
+bba_run <- resampling_fisheries_overlap(x = bba, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
+                                                   threat_df = fish_df, grid_res = 2, n_cores = 4, 
+                                                   proj_utm = proj_utm, proj_dec = proj_dec) 
+# 7.8 mins for 1000 iterations/4 cores
+
+# plotting output
+ggplot(bba_run, aes(sample, overlap)) + geom_line(aes(group = iteration))
+ggplot(bba_run, aes(sample, o_change_p)) + geom_line(aes(group = iteration))
+
+# pasting out
+out_name <- paste0(out_direx, "bba02_50.csv")
+write.csv(bba_run, out.name)
+
+
+##### 3B. GHA ######
+
+gha_run <- resampling_fisheries_overlap(x = gha, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
+                                         threat_df = fish_df, grid_res = 2, n_cores = 4, 
+                                         proj_utm = proj_utm, proj_dec = proj_dec) 
+# X for 1000 iterations/4 cores
+
+# plotting output
+ggplot(gha_run, aes(sample, overlap)) + geom_line(aes(group = iteration))
+ggplot(gha_run, aes(sample, o_change_p)) + geom_line(aes(group = iteration))
+
+# pasting out
+out_name <- paste0(out_direx, "gha99_50.csv")
+write.csv(gha_run, out.name)
+
+
+##### 3C. WA ######
+
+wa_run <- resampling_fisheries_overlap(x = wa, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
+                                        threat_df = fish_df, grid_res = 2, n_cores = 4, 
+                                        proj_utm = proj_utm, proj_dec = proj_dec) 
+# X for 1000 iterations/4 cores
+
+# plotting output
+ggplot(wa_run, aes(sample, overlap)) + geom_line(aes(group = iteration))
+ggplot(wa_run, aes(sample, o_change_p)) + geom_line(aes(group = iteration))
+
+# pasting out
+out_name <- paste0(out_direx, "waall_50.csv")
+write.csv(wa_run, out.name)
+
+
+##### 3D. WCP ######
+
+wcp_run <- resampling_fisheries_overlap(x = wcp, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
+                                       threat_df = fish_df, grid_res = 2, n_cores = 4, 
+                                       proj_utm = proj_utm, proj_dec = proj_dec) 
+# X for 1000 iterations/4 cores
+
+# plotting output
+ggplot(wcp_run, aes(sample, overlap)) + geom_line(aes(group = iteration))
+ggplot(wcp_run, aes(sample, o_change_p)) + geom_line(aes(group = iteration))
+
+# pasting out
+out_name <- paste0(out_direx, "wcpboth_50.csv")
+write.csv(wcp_run, out.name)
+
