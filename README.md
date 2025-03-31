@@ -58,8 +58,3 @@ The attached archived file(s) contain data derived from long-term tracking proje
 4. In order to maintain funding for the project and for further analyses, every few years we submit proposals to funding agencies. It is therefore very helpful for those running the project to know which data analyses are in progress elsewhere.
 
 If you are interested in analysing the detailed project data in any depth, you may find it helpful to have access to the full database rather than the files available here.  If so, we are always open to further collaboration.
-
-Example dataset 
-
-
-
