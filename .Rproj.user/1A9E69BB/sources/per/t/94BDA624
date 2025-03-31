@@ -1,12 +1,12 @@
 {
-    "id": "ADFA3F09",
+    "id": "94BDA624",
     "path": "~/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/1b_individual_overlap_sample_sizes.R",
     "project_path": "Codes/1_predicting_minimum_sample_sizes/1b_individual_overlap_sample_sizes.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "3598874042",
     "contents": "",
     "dirty": false,
-    "created": 1742587358127.0,
+    "created": 1743288593858.0,
     "source_on_save": false,
     "relative_order": 3,
     "properties": {
@@ -14,14 +14,14 @@
         "source_window_id": "",
         "Source": "Source",
         "cursorPosition": "43,3",
-        "scrollLine": "0"
+        "scrollLine": "4"
     },
-    "folds": "12|55|33|0|\n75|110|132|0|\n147|84|207|0|\n",
+    "folds": "",
     "lastKnownWriteTime": 1742593509,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1742593513671,
+    "last_content_update": 1742593509,
     "read_only": false,
     "read_only_alternatives": []
 }

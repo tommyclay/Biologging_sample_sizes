@@ -1,77 +1,37 @@
 library(lme4)
 library(lmtest)
 library(multcomp)
+library(emmeans)
 
 in_direx <- "./Data_outputs/"
 
 #### 1. LOAD IN PREDICTIONS ####
 
-# 50% and 95% UDs area occupied predictions for pop size of 100
-pred1 <- read.csv(paste0(in_direx, "XX.csv"))
+# load in area occupied file
+pred_50 <- read.csv(paste0(in_direx, "area_occupied_50_predictions.csv"))
+pred_95 <- read.csv(paste0(in_direx, "area_occupied_95_predictions.csv"))
 
-# 50% and 95% UDs for a range of population sizes
-pred2 <- read.csv(paste0(in_direx, "XX.csv"))
+# 1. predictions from the four model types
+pred1_50 <- subset(pred_50, pop_size == 100,)
+pred1_95 <- subset(pred_95, pop_size == 100,)
 
-# predictions from the four model types
-pred3 <-  read.csv(paste0(in_direx, "XX.csv"))
+# 2. 50% and 95% UDs for a range of population sizes
+pred2_50 <- subset(pred_50, model == "MM3",)
+pred2_95 <- subset(pred_95, model == "MM3",)
 
-# birdlife representativeness predictions
+# 3. 50% and 95% UDs area occupied predictions for pop size of 100
+p3_50 <- subset(pred2_50, pop_size == 100,)
+p3_50$iso <- 50
+p3_95 <- subset(pred2_95, pop_size == 100,)
+p3_95$iso <- 95
+pred3 <- rbind(p3_50, p3_95)
+
+# 4. 50% UD area occupued versus representativeness based on inclusion
+# incorporating birdlife predictions
 pred_bl <- read.csv(paste0(in_direx, "birdlife_predictions.csv"))
-# convert to pred 4 by adding area occupied predictions as well
-pred4 <- data.frame()
-
-###### REMOVE THIS BELOW ##########
-
-# comparing asymptotic model types
-pred1_50 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),4),
-                      year = rep(c("10", "11", "All", "02", "03", "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04", "08", "09", "All", "03", "13", "Both"), 4),
-                      pred = c(7, 18, 12,  8,  7, 3, 16, 19, 19, 20, 11, 8, 9, 4, 30, 25, 18, 22, 21, 18, 26,
-                               6, 14, 10, 10, 12, 3, 14, 16, 15, 19, 10, 8, 8, 4, 30, 24, 17, 21, 18, 17, 25,
-                               3,  4,  4,  4,  3, 2,  4,  6,  6,  6,  4, 3, 4, 2,  9,  9,  6,  9,  6,  5,  8,
-                               3,  5,  5,  4,  4, 2,  5,  7,  7,  8,  6, 4, 5, 3, 10, 11,  9, 12,  6,  6, 10),
-                      model = rep(c("MM2", "MM3", "AR2", "AR3"), each = 21))
-pred1_95 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),4),
-                      year = rep(c("10", "11", "All", "02", "03",  "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04","08", "09", "All", "03", "13", "Both"), 4),
-                      pred = c(12, 13, 17, 32, 25, 29, 14, 28, 32, 29, 18, 14,  9, 19, 27, 31, 34, 33, 21, 15, 20,
-                               14, 15, 25, 37, 28, 33, 15, 29, 36, 36, 20, 16, 11, 21, 28, 31, 39, 35, 23, 15, 20,
-                               4,  4,  5, 11,  8,  7,  4,  9, 11,  9,  6,  4,  3,  7,  8, 11, 12, 14,  6,  4,  6,
-                               6,  5, 10, 16, 12, 10,  5, 11, 15, 15, 10,  7,  7, 10,  8, 15, 18, 21,  8,  6,  8),
-                      model = rep(c("MM2", "MM3", "AR2", "AR3"), each = 21))
-
-# comparing for different range of pop sizes
-pred2_50 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),5),
-                      year = rep(c("10", "11", "All", "02", "03", "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04", "08", "09", "All", "03", "13", "Both"), 5),
-                      pred = c(6, 14, 10, 10, 12, 3, 14, 16, 15, 19, 10, 8, 8, 4, 30, 24, 17, 21, 18, 17, 25,
-                               6, 16, 11, 11, 13, 3, 16, 18, 18, 23, 10, 8, 9, 4, 42, 30, 21, 26, 21, 20, 32, 
-                               6, 16, 12, 11, 14, 3, 16, 19, 18, 23, 10, 8, 9, 4, 44, 31, 21, 27, 21, 20, 33,
-                               6, 16, 12, 11, 14, 3, 16, 19, 18, 23, 10, 8, 9, 4, 44, 31, 21, 27, 21, 21, 33,
-                               6, 16, 12, 11, 14, 3, 16, 19, 18, 23, 10, 8, 9, 4, 44, 31, 21, 27, 21, 21, 33),
-                      pop = rep(c(100, 1000, 10000, 100000, 1000000), each = 21))
-pred2_95 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),5),
-                      year = rep(c("10", "11", "All", "02", "03", "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04", "08", "09", "All", "03", "13", "Both"), 5),
-                      pred = c(14, 15, 25, 37, 28, 33, 15, 29, 36, 36, 20, 16, 11, 21, 28, 31, 39, 35, 23, 15, 20,
-                               16, 17, 32, 58, 39, 48, 17, 40, 54, 54, 24, 16, 13, 26, 38, 44, 61, 52, 29, 17, 24,
-                               16, 17, 33, 61, 40, 51, 17, 42, 57, 57, 25, 19, 13, 27, 40, 46, 65, 54, 30, 17, 24,
-                               16, 17, 33, 61, 40, 51, 17, 42, 58, 58, 25, 20, 13, 27, 40, 46, 65, 55, 30, 17, 24,
-                               16, 17, 33, 61, 40, 51, 17, 42, 58, 58, 25, 20, 13, 27, 40, 46, 65, 55, 30, 17, 24),
-                      pop = rep(c(100, 1000, 10000, 100000, 1000000), each = 21))
-# comparing 50% and 95% UD predictions
-pred3 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),2),
-                    year = rep(c("10", "11", "All", "02", "03", "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04", "08", "09", "All", "03", "13", "Both"), 2),
-                    pred = c( 6, 14, 10, 10,  12, 3, 14, 16, 15, 19, 10,  8,  8,  4, 30, 24, 17, 21, 18, 17, 25,
-                              14, 15, 25, 37, 28, 33, 15, 29, 36, 36, 20, 16, 11, 21, 28, 31, 39, 35, 23, 15, 20),
-                    iso = rep(c(50, 95), each = 21))
-# comparing different methods
-pred4 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", "BS", "BS", "GHA", "LMA", "LMA", "NGP", "SGP", "WA", "WA", "WA", "WA", "WCP", "WCP", "WCP"),3),
-                    year = rep(c("10", "11", "All", "02", "03", "11", "02", "12", "Both", "99", "04", "05", "00", "00", "04", "08", "09", "All", "03", "13", "Both"), 3),
-                    pred = c(6,  14, 10, 10, 12,  3, 14, 16, 15, 19, 10, 8,  8,  4, 30, 24, 17, 21, 18, 17, 25,
-                               2,  11,  3,  2,  2,  3,  6,  6,  6,  5,  3, 2,  2,  1,  7,  6,  5,  5,  6,  5,  6,
-                               11, 68, 22, 12, 12, 32, 28, 43, 46, 37, 22, 9, 12,  5, 55, 47, 36, 41, 44, 30, 44),
-                    method = rep(c("Total Area Occupied", "Inclusion70", "Inclusion95"), each = 21))
-
-
-##### UP TO HERE #####
-
+pred4 <- data.frame(prediction = c(pred_bl$Rep70, pred_bl$Rep95, p3_50$prediction),
+                    method = rep(c("Inclusion70", "Inclusion95", "Area Occupied"), each = length(pred_bl$Rep70)),
+                    dataset = rep(pred_bl$Dataset, 3))
 
 
 #### 2. AREA OCCUPIED - COMPARE 50% & 95% UD PREDICTIONS AMONG DIFFERENT ASYMPTOTIC MODEL TYPES ####
@@ -79,55 +39,56 @@ pred4 <- data.frame(species = rep(c("AP", "AP", "AP", "BBA", "BBA", "BP", "BS", 
 ##### 2A. 50% UD ######
 
 pred1_50$model <- as.factor(as.character(pred1_50$model))
-pred1_50$sp_yr <- as.factor(as.character(paste(pred1_50$species, pred1_50$year, sep = "_")))
+pred1_50$dataset <- as.factor(as.character(pred1_50$dataset))
 
-mod1_50 <- glmer(pred ~ model + (1|sp_yr), data = pred1_50, family = "poisson")
+mod1_50 <- glmer(prediction ~ model + (1|dataset), data = pred1_50, family = "poisson")
 summary(mod1_50)
 mod1_50_2 <- update(mod1_50,~.- model)
 lrtest(mod1_50, mod1_50_2)
-# Model 1: pred ~ model + (1 | sp_yr)
-# Model 2: pred ~ (1 | sp_yr)
-# #Df  LogLik Df  Chisq            Pr(>Chisq)    
-# 1   5 -205.90                                    
-# 2   2 -295.78 -3 179.75 < 0.00000000000000022 ***
+# Model 1: prediction ~ model + (1 | dataset)
+# Model 2: prediction ~ (1 | dataset)
+# #Df  LogLik Df  Chisq Pr(>Chisq)    
+# 1   5 -205.95                         
+# 2   2 -292.58 -3 173.26  < 2.2e-16 ***
 plot(mod1_50)
 
 # tukey's tests for adjusted pairwise comparisons
 summary(glht(mod1_50, mcp(model="Tukey")))
 # Linear Hypotheses:
-#                Estimate  Std. Error z value  Pr(>|z|)    
-# AR3 - AR2 == 0  0.20997    0.12946   1.622    0.360    
-# MM2 - AR2 == 0  1.09861    0.11109   9.889  <0.0001 ***
-# MM3 - AR2 == 0  1.03428    0.11201   9.234  <0.0001 ***
-# MM2 - AR3 == 0  0.88865    0.10290   8.636  <0.0001 ***
-# MM3 - AR3 == 0  0.82432    0.10389   7.934  <0.0001 ***
-# MM3 - MM2 == 0 -0.06433    0.07985  -0.806    0.849   
+# Estimate Std. Error z value Pr(>|z|)    
+# AR3 - AR2 == 0  0.20997    0.12944   1.622    0.360    
+# MM2 - AR2 == 0  1.09861    0.11108   9.891   <1e-04 ***
+# MM3 - AR2 == 0  1.00049    0.11250   8.893   <1e-04 ***
+# MM2 - AR3 == 0  0.88864    0.10289   8.637   <1e-04 ***
+# MM3 - AR3 == 0  0.79052    0.10442   7.571   <1e-04 ***
+# MM3 - MM2 == 0 -0.09812    0.08054  -1.218    0.609  
+
 
 ##### 2B. 95% UD ######
 
 pred1_95$model <- as.factor(as.character(pred1_95$model))
-pred1_95$sp_yr <- as.factor(as.character(paste(pred1_95$species, pred1_95$year, sep = "_")))
+pred1_95$dataset <- as.factor(as.character(pred1_95$dataset))
 
-mod1_95 <- glmer(pred ~ model + (1|sp_yr), data = pred1_95, family = "poisson")
+mod1_95 <- glmer(prediction ~ model + (1|dataset), data = pred1_95, family = "poisson")
 summary(mod1_95)
 mod1_95_2 <- update(mod1_95,~.- model)
 lrtest(mod1_95, mod1_95_2)
-# Model 1: pred ~ model + (1 | sp_yr)
-# Model 2: pred ~ (1 | sp_yr)
-# #Df  LogLik Df  Chisq            Pr(>Chisq)    
-# 1   5 -225.31                                    
-# 2   2 -379.80 -3 308.96 < 0.00000000000000022 ***
+# Model 1: prediction ~ model + (1 | dataset)
+# Model 2: prediction ~ (1 | dataset)
+# #Df  LogLik Df  Chisq Pr(>Chisq)    
+# 1   5 -224.93                         
+# 2   2 -378.56 -3 307.25  < 2.2e-16 ***
 plot(mod1_95)
 
 summary(glht(mod1_95, mcp(model="Tukey")))
 # Linear Hypotheses:
 # Estimate Std. Error z value Pr(>|z|)    
-# AR3 - AR2 == 0  0.37673    0.10467   3.599  0.00176 ** 
+# AR3 - AR2 == 0  0.38566    0.10448   3.691  0.00133 ** 
 # MM2 - AR2 == 0  1.12654    0.09276  12.145  < 0.001 ***
 # MM3 - AR2 == 0  1.23676    0.09156  13.507  < 0.001 ***
-# MM2 - AR3 == 0  0.74981    0.08102   9.255  < 0.001 ***
-# MM3 - AR3 == 0  0.86003    0.07965  10.798  < 0.001 ***
-# MM3 - MM2 == 0  0.11022    0.06319   1.744  0.29402    
+# MM2 - AR3 == 0  0.74088    0.08077   9.172  < 0.001 ***
+# MM3 - AR3 == 0  0.85110    0.07940  10.719  < 0.001 ***
+# MM3 - MM2 == 0  0.11022    0.06319   1.744  0.29398    
 
 
 #### 3. AREA OCCUPIED - COMPARE 50% & 95% UD PREDICTIONS FOR RANGE OF POP SIZES ####
@@ -135,120 +96,181 @@ summary(glht(mod1_95, mcp(model="Tukey")))
 ##### 3A. 50% UD ######
 
 pred2_50$pop <- as.factor(as.character(pred2_50$pop))
-pred2_50$sp_yr <- as.factor(as.character(paste(pred2_50$species, pred2_50$year, sep = "_")))
+pred2_50$dataset <- as.factor(as.character(pred2_50$dataset))
 
-mod2_50 <- glmer(pred ~ pop + (1|sp_yr), data = pred2_50, family = "poisson")
+mod2_50 <- glmer(prediction ~ pop + (1|dataset), data = pred2_50, family = "poisson")
 summary(mod2_50)
 # remove effect of population size and test significance
 mod2_50_2 <- update(mod2_50,~.- pop)
 lrtest(mod2_50, mod2_50_2)
-# Model 1: pred ~ pop + (1 | sp_yr)
-# Model 2: pred ~ (1 | sp_yr)
-# #Df  LogLik Df  Chisq Pr(>Chisq)  
-# 1   6 -282.68                       
-# 2   2 -287.52 -4 9.6857    0.04607 *
+# Model 1: prediction ~ pop + (1 | dataset)
+# Model 2: prediction ~ (1 | dataset)
+# #Df  LogLik Df Chisq Pr(>Chisq)  
+# 1   6 -280.66                      
+# 2   2 -285.56 -4  9.81    0.04375 *
 plot(mod2_50)
 
 # tukey's tests for adjusted pairwise comparisons
 summary(glht(mod2_50, mcp(pop="Tukey")))
 # Linear Hypotheses:
-#                           Estimate   Std. Error z value Pr(>|z|)  
-# 1000 - 100 == 0        0.173424053  0.077988386   2.224   0.1708  
-# 10000 - 100 == 0       0.195523144  0.077598128   2.520   0.0861 .
-# 100000 - 100 == 0      0.198253176  0.077550375   2.556   0.0786 .
-# 1000000 - 100 == 0     0.198250214  0.077550431   2.556   0.0786 .
-# 10000 - 1000 == 0      0.022099092  0.074130881   0.298   0.9983  
-# 100000 - 1000 == 0     0.024829123  0.074080895   0.335   0.9973  
-# 1000000 - 1000 == 0    0.024826162  0.074080951   0.335   0.9973  
-# 100000 - 10000 == 0    0.002730031  0.073669941   0.037   1.0000  
-# 1000000 - 10000 == 0   0.002727070  0.073669996   0.037   1.0000  
-# 1000000 - 100000 == 0 -0.000002961  0.073619698   0.000   1.0000  
+#                     Estimate Std. Error z value Pr(>|z|)  
+# 1000 - 100 == 0     1.789e-01  7.921e-02   2.258   0.1585  
+# 10000 - 100 == 0    2.016e-01  7.880e-02   2.558   0.0781 .
+# 1e+05 - 100 == 0    2.016e-01  7.880e-02   2.558   0.0781 .
+# 1e+06 - 100 == 0    2.016e-01  7.880e-02   2.558   0.0781 .
+# 10000 - 1000 == 0   2.273e-02  7.517e-02   0.302   0.9982  
+# 1e+05 - 1000 == 0   2.272e-02  7.517e-02   0.302   0.9982  
+# 1e+06 - 1000 == 0   2.272e-02  7.517e-02   0.302   0.9982  
+# 1e+05 - 10000 == 0 -4.240e-06  7.474e-02   0.000   1.0000  
+# 1e+06 - 10000 == 0 -5.333e-06  7.474e-02   0.000   1.0000  
+# 1e+06 - 1e+05 == 0 -1.093e-06  7.474e-02   0.000   1.0000  
+
+# getting effect sizes
+emmeans(mod2_50, pairwise ~pop, adjust = "tukey")
+# $emmeans
+# pop   emmean    SE  df asymp.LCL asymp.UCL
+# 100     2.43 0.161 Inf      2.11      2.74
+# 1000    2.61 0.160 Inf      2.29      2.92
+# 10000   2.63 0.159 Inf      2.32      2.94
+# 1e+05   2.63 0.159 Inf      2.32      2.94
+# 1e+06   2.63 0.159 Inf      2.32      2.94
+exp(2.43) # 11
+exp(2.61) # 14
+
+# prediction for 1000 pop size
+mean(pred2_50$prediction[pred2_50$pop == "1000"]) # 16.57143
+range(pred2_50$prediction[pred2_50$pop == "1000"]) #  2 42
+
 
 
 ##### 3A. 95% UD ######
 
 pred2_95$pop <- as.factor(as.character(pred2_95$pop))
-pred2_95$sp_yr <- as.factor(as.character(paste(pred2_95$species, pred2_95$year, sep = "_")))
+pred2_95$dataset <- as.factor(as.character(pred2_95$dataset))
 
-mod2_95 <- glmer(pred ~ pop + (1|sp_yr), data = pred2_95, family = "poisson")
+mod2_95 <- glmer(prediction ~ pop + (1|dataset), data = pred2_95, family = "poisson")
 summary(mod2_95)
 # remove effect of population size and test significance
 mod2_95_2 <- update(mod2_95,~.- pop)
 lrtest(mod2_95, mod2_95_2)
-# Model 1: pred ~ pop + (1 | sp_yr)
-# Model 2: pred ~ (1 | sp_yr)
+# Model 1: prediction ~ pop + (1 | dataset)
+# Model 2: prediction ~ (1 | dataset)
 # #Df  LogLik Df  Chisq Pr(>Chisq)    
-# 1   6 -326.29                         
-# 2   2 -355.96 -4 59.341  3.989e-12 ***
+# 1   6 -326.01                         
+# 2   2 -355.76 -4 59.492  3.709e-12 ***
 plot(mod2_95)
 
 # tukey's tests for adjusted pairwise comparisons
 summary(glht(mod2_95, mcp(pop="Tukey")))
 # Linear Hypotheses:
-#                       Estimate    Std. Error   z value Pr(>|z|)    
-# 1000 - 100 == 0       0.310665611 0.057263910   5.425 <0.00001 ***
-# 10000 - 100 == 0      0.354209109 0.056745570   6.242 <0.00001 ***
-# 100000 - 100 == 0     0.359519863 0.056683566   6.343 <0.00001 ***
-# 1000000 - 100 == 0    0.359521188 0.056683551   6.343 <0.00001 ***
-# 10000 - 1000 == 0     0.043543497 0.052103325   0.836    0.919    
-# 100000 - 1000 == 0    0.048854252 0.052035789   0.939    0.881    
-# 1000000 - 1000 == 0   0.048855576 0.052035773   0.939    0.881    
-# 100000 - 10000 == 0   0.005310755 0.051464821   0.103    1.000    
-# 1000000 - 10000 == 0  0.005312079 0.051464804   0.103    1.000    
-# 1000000 - 100000 == 0 0.000001325 0.051396429   0.000    1.000    
+# Estimate Std. Error z value Pr(>|z|)    
+# 1000 - 100 == 0    0.314822   0.057214   5.503   <1e-04 ***
+# 10000 - 100 == 0   0.355534   0.056730   6.267   <1e-04 ***
+# 1e+05 - 100 == 0   0.358191   0.056699   6.317   <1e-04 ***
+# 1e+06 - 100 == 0   0.359517   0.056684   6.343   <1e-04 ***
+# 10000 - 1000 == 0  0.040712   0.052031   0.782    0.936    
+# 1e+05 - 1000 == 0  0.043369   0.051997   0.834    0.920    
+# 1e+06 - 1000 == 0  0.044695   0.051980   0.860    0.911    
+# 1e+05 - 10000 == 0 0.002657   0.051465   0.052    1.000    
+# 1e+06 - 10000 == 0 0.003983   0.051448   0.077    1.000    
+# 1e+06 - 1e+05 == 0 0.001326   0.051414   0.026    1.000      
+
+# getting effect sizes
+emmeans(mod2_95, pairwise ~pop, adjust = "tukey")
+# $emmeans
+# pop   emmean    SE  df asymp.LCL asymp.UCL
+# 100     3.12 0.112 Inf      2.90      3.34
+# 1000    3.43 0.109 Inf      3.22      3.65
+# 10000   3.47 0.109 Inf      3.26      3.69
+# 1e+05   3.48 0.109 Inf      3.26      3.69
+# 1e+06   3.48 0.109 Inf      3.26      3.69
+exp(3.12) # 23
+exp(3.43) # 31
+
+# prediction for 1000 pop size
+mean(pred2_95$prediction[pred2_95$pop == "1000"]) # 34.38095
+range(pred2_95$prediction[pred2_95$pop == "1000"]) #  13 61
 
 
 #### 4. AREA OCCUPIED - COMPARE 50% & 95% UD PREDICTIONS FOR POP SIZE OF 100 ####
 
 pred3$iso <- as.factor(as.character(pred3$iso))
-pred3$sp_yr <- as.factor(as.character(paste(pred3$sp, pred3$yr, sep = "_")))
+pred3$dataset <- as.factor(as.character(pred3$dataset))
 
 # running glmm
-mod3 <- glmer(pred ~ iso + (1|sp_yr), data = pred3, family = "poisson")
+mod3 <- glmer(prediction ~ iso + (1|dataset), data = pred3, family = "poisson")
 summary(mod3)
 # remove effect of isopleth and test significance
 mod3_2 <- update(mod3,~.- iso)
-# lrtest(mod3, mod3_2)
-# Model 1: pred ~ iso + (1 | sp_yr)
-# Model 2: pred ~ (1 | sp_yr)
-# #Df  LogLik Df  Chisq           Pr(>Chisq)    
-# 1   3 -146.28                                   
-# 2   2 -177.51 -1 62.476 0.000000000000002698 ***
+lrtest(mod3, mod3_2)
+# Model 1: prediction ~ iso + (1 | dataset)
+# Model 2: prediction ~ (1 | dataset)
+# #Df  LogLik Df  Chisq Pr(>Chisq)    
+# 1   3 -154.90                         
+# 2   2 -189.43 -1 69.066  < 2.2e-16 ***
 plot(mod3)
 
 # calculating mean and range for each isopleth category
 
 # core
-mean(pred3$pred[pred3$iso == "50"]) # 14.33333
-sd(pred3$pred[pred3$iso == "50"]) # 7.059273
-range(pred3$pred[pred3$iso == "50"]) # 3 30
+mean(pred3$prediction[pred3$iso == "50"]) # 13.85714
+sd(pred3$prediction[pred3$iso == "50"]) # 7.445037
+range(pred3$prediction[pred3$iso == "50"]) # 2 30
 
 # general use
-mean(pred3$pred[pred3$iso == "95"]) # 25.09524
-sd(pred3$pred[pred3$iso == "95"]) #  8.898903
-range(pred3$pred[pred3$iso == "95"]) # 11 39
+mean(pred3$prediction[pred3$iso == "95"]) # 25.09524
+sd(pred3$prediction[pred3$iso == "95"]) #  8.898903
+range(pred3$prediction[pred3$iso == "95"]) # 11 39
+
+# number of datasets required for less than 10, 11-20, 21-30, 31-40
+
+# 50% UD
+nrow(pred3[pred3$prediction <= 10 & pred3$iso == "50",]) 
+# 9
+nrow(pred3[pred3$prediction <= 20 & pred3$prediction > 10 & pred3$iso == "50",]) 
+# 8
+nrow(pred3[pred3$prediction <= 30 & pred3$prediction > 20 & pred3$iso == "50",]) 
+# 4 
+
+# 95% UD
+nrow(pred3[pred3$prediction <= 20 & pred3$prediction > 10 & pred3$iso == "95",]) 
+# 8  
+nrow(pred3[pred3$prediction <= 30 & pred3$prediction > 20 & pred3$iso == "95",]) 
+# 6
+nrow(pred3[pred3$prediction <= 40 & pred3$prediction > 30 & pred3$iso == "95",]) 
+# 7
+
 
 
 #### 5. COMPARING PREDICTIONS FROM DIFFERENT METHODS - AREA OCCUPIED VS BIRDLIFE REPRESENTATITVENESS ####
 
 pred4$method <- as.factor(as.character(pred4$method))
-pred4$sp_yr <- as.factor(as.character(paste(pred4$species, pred4$yr, sep = "_")))
+pred4$dataset <- as.factor(as.character(pred4$dataset))
 
-mod4 <- glmer(pred ~ method + (1|sp_yr), data = pred4, family = "poisson")
+mod4 <- glmer(prediction ~ method + (1|dataset), data = pred4, family = "poisson")
 summary(mod4)
 mod4_2 <- update(mod4,~.- method)
 lrtest(mod4_2, mod4)
-# Model 1: pred ~ (1 | sp_yr)
-# Model 2: pred ~ method + (1 | sp_yr)
-# #Df  LogLik Df  Chisq            Pr(>Chisq)    
-# 1   2 -454.44                                    
-# 2   4 -212.30  2 484.29 < 0.00000000000000022 ***
+# Model 1: prediction ~ (1 | dataset)
+# Model 2: prediction ~ method + (1 | dataset)
+# #Df  LogLik Df  Chisq Pr(>Chisq)    
+# 1   2 -450.49                         
+# 2   4 -186.67  2 527.64  < 2.2e-16 ***
   
 # tukey's tests for adjusted pairwise comparisons
 summary(glht(mod4, mcp(method ="Tukey")))
 # Linear Hypotheses:
-#                                         Estimate Std. Error z value            Pr(>|z|)    
-# Inclusion95 - Inclusion70 == 0          1.94286    0.11006  17.654 <0.0000000000000002 ***
-# Total Area Occupied - Inclusion70 == 0  1.16382    0.11791   9.871 <0.0000000000000002 ***
-# Total Area Occupied - Inclusion95 == 0 -0.77904    0.06947 -11.214 <0.0000000000000002 ***
+#                           Estimate Std. Error z value            Pr(>|z|)    
+#   Inclusion70 - Area Occupied == 0 -1.14072    0.11862  -9.617   <2e-16 ***
+#   Inclusion95 - Area Occupied == 0  0.85610    0.06968  12.286   <2e-16 ***
+#   Inclusion95 - Inclusion70 == 0    1.99682    0.11004  18.146   <2e-16 ***
+
+mean(pred4$prediction[pred4$method == "Area Occupied"]) # 14
+range(pred4$prediction[pred4$method == "Area Occupied"]) #  2 30
+
+mean(pred4$prediction[pred4$method == "Inclusion70"]) # 4
+range(pred4$prediction[pred4$method == "Inclusion70"]) #  1 10
+
+mean(pred4$prediction[pred4$method == "Inclusion95"]) # 33
+range(pred4$prediction[pred4$method == "Inclusion95"]) #  6  79
 
