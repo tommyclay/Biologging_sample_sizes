@@ -1,4 +1,4 @@
-Family,Species,Breed_stage,BA
+family,species,breed_stage,ba
 Alcidae,Alca torda,incubation,0.56
 Alcidae,Alca torda,chick-rearing,0.65
 Alcidae,Alca torda,unspec. breeding,0.76

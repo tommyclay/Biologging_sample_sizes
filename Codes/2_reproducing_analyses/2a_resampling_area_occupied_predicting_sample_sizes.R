@@ -31,7 +31,7 @@ proj_fun <- function(df_in, proj_in, proj_out) {
 # if utm, put smoothing factor in metres not km
 resampling_UD_area <- function(x, n_iter, iso_level, cellsize, h, proj_in, proj_out, n_core, verbose = TRUE) {
   # re-projecting to utm to calculate kernel, if needed
-  if (proj_in != proj_utm) {
+  if (proj_in != proj_out) {
     x <- proj_fun(df_in = x, proj_in = proj_in, proj_out = proj_out) 
   } else { proj_out <- proj_in }
   
