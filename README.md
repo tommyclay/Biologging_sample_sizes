@@ -2,9 +2,9 @@
 
 Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Navarro, Jacob González-Solís, Andrea Manica
 
-## Overview and data
+## Overview
 
-The following repository contains codes to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
+The following repository contains codes and datasets to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
 
 ## Codes
 
