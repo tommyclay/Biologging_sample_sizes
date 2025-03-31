@@ -12,17 +12,42 @@ The codes are laid out into three sections:
 
 ### 1) Predicting minimum sample sizes required based on spatial biologging data
 
-**X.r**: This comprises code 
+**1a_resampling_predicting_sample_sizes.r**: This comprises code....
+
+**1b_individual_overlap_sample_sizes.r**: This comprises code....
+
 
 ### 2) Reproducing analyses from the paper
 
-**2a_geolocator_validation_filtering.r**: This comprises code to run an equinox filter that removes positions 15 days either side of the equinoxes, a latitudinal filter to remove extreme latitudinal outliers (positions south of 70°S or north of the equator), and a speed filter that removes positions that would require unrealistic flight speeds.
+**2a_resampling_area_occupied_predicting_sample_sizes.r**: This comprises code to...
+
+**2b_resampling_birdlife_predicting_sample_sizes.r**: This comprises code to...
+
+**2c_glmms_comparing_predicted_sample_sizes.r**: This comprises code to...
+
+**2d_testing_og_sample_size_on_predictions.r**: This comprises code to...
+
+**2e_calculate_among_individual_overlap.r**: This comprises code to...
+
+**2f_linking_individual_overlap_sample_sizes.r**: This comprises code to...
+
+**2g_resampling_fisheries_overlap.r**: This comprises code to...
+
 
 ### 3) Reproducing figures from the paper
 
-**3_X.r**: This comprises code 
+**3a_fig2_asymptotic_plots.r**: This comprises code...
 
-## Data (please read before using)
+**3b_fig3_sensitivity_analysis_og_sample_size.r**: This comprises code...
+
+**3c_fig4_individual_overlap_maps.r**: This comprises code...
+
+**3d_fig5_among-individual_overlap_sample_size.r**: This comprises code...
+
+**3e_fig6_sample_size_fisheries_overlap.r**: This comprises code...
+
+
+## Data use statement (please read before using)
 
 The attached archived file(s) contain data derived from long-term tracking projects on albatrosses and petrels at Bird Island (South Georgia). This is a request to please let us know if you use them.  Several people have made extensive efforts overseeing the data collection for the last 25+ years. If you plan to analyse the data, there are a number of reasons why it would be very helpful if you could contact Richard Phillips (raphil@bas.ac.uk) before doing so: 
 
