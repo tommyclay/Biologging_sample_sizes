@@ -2,15 +2,15 @@
 
 Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Navarro, Jacob González-Solís, Andrea Manica
 
-## Overview and data
+## Overview
 
-The following repository contains codes to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
+The following repository contains codes and datasets to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
 
 ## Codes
 
 The codes are laid out into three sections: 
 
-### 1) Predicting minimum sample sizes required based on spatial biologging data
+### 1) Predicting minimum sample sizes required (apply to own spatial biologging data)
 
 **1a_resampling_predicting_sample_sizes.r**: This code...
 
@@ -36,15 +36,16 @@ The codes are laid out into three sections:
 
 ### 3) Reproducing figures from the paper
 
-**3a_fig2_asymptotic_plots.r**: This comprises code...
+**3a_fig2_asymptotic_plots.r**: loads in resampled datasets and models to predict the asymptotic relationships between sample size and home-range area (Fig. 2).
 
-**3b_fig3_sensitivity_analysis_og_sample_size.r**: This comprises code...
+**3b_fig3_sensitivity_analysis_og_sample_size.r**: loads in predictions from sensitivity analysis (2d, above) to plot the relationship between original sample sizes and minimum sample sizes required 
+(Fig. 3). 
 
-**3c_fig4_individual_overlap_maps.r**: This comprises code...
+**3c_fig4_individual_overlap_maps.r**: loads in GLS datasets, creates kernel UDs for each individual and the population and plots maps for each species and year combination (Fig. 4).
 
 **3d_fig5_among-individual_overlap_sample_size.r**: This comprises code...
 
-**3e_fig6_sample_size_fisheries_overlap.r**: This comprises code...
+**3e_fig6_sample_size_fisheries_overlap.r**: loads in resampled fisheries overlap datasets and plots the relationships between sample size and the total value of and change in fisheries overlap score (Fig. 6). 
 
 
 ## Data use statement (please read before using)
@@ -57,8 +58,3 @@ The attached archived file(s) contain data derived from long-term tracking proje
 4. In order to maintain funding for the project and for further analyses, every few years we submit proposals to funding agencies. It is therefore very helpful for those running the project to know which data analyses are in progress elsewhere.
 
 If you are interested in analysing the detailed project data in any depth, you may find it helpful to have access to the full database rather than the files available here.  If so, we are always open to further collaboration.
-
-Example dataset 
-
-
-
