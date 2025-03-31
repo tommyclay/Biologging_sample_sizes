@@ -10,7 +10,7 @@ The following repository contains codes to 1) predict minimum sample sizes requi
 
 The codes are laid out into three sections: 
 
-### 1) Predicting minimum sample sizes required based on spatial biologging data
+### 1) Predicting minimum sample sizes required (apply to own spatial biologging data)
 
 **1a_resampling_predicting_sample_sizes.r**: This code...
 
