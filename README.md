@@ -36,7 +36,7 @@ The codes are laid out into three sections:
 
 ### 3) Reproducing figures from the paper
 
-**3a_fig2_asymptotic_plots.r**: load in resampled datasets and models to predict asymptotic relationships between the number of individuals tracked and home-range area (Fig. 2).
+**3a_fig2_asymptotic_plots.r**: load in resampled datasets and models to predict the asymptotic relationships between sample size and home-range area (Fig. 2).
 
 **3b_fig3_sensitivity_analysis_og_sample_size.r**: load in predictions from sensitivity analysis (2d, above) to plot the relationship between original sample sizes and minimum sample sizes required 
 (Fig. 3). 
@@ -45,7 +45,7 @@ The codes are laid out into three sections:
 
 **3d_fig5_among-individual_overlap_sample_size.r**: This comprises code...
 
-**3e_fig6_sample_size_fisheries_overlap.r**: load in resampled fisheries overlap datasets and plots the relationships between the number of individuals tracked and the total and change in fisheries overlap scores (Fig. 6). 
+**3e_fig6_sample_size_fisheries_overlap.r**: load in resampled fisheries overlap datasets and plots the relationships between sample size and the total value of and change in fisheries overlap score (Fig. 6). 
 
 
 ## Data use statement (please read before using)
