@@ -12,9 +12,9 @@ The codes are laid out into three sections:
 
 ### 1) Predicting minimum sample sizes required (apply to own spatial biologging data)
 
-**1a_resampling_predicting_sample_sizes.r**: This code...
+**1a_resampling_predicting_sample_sizes.r**: for example datasets, resamples home-range area occupied with increasing sample size, runs asymptotic models and the predicts the minimum sample size required. The resampling code can take a long time to run depending on the size of the dataset. 
 
-**1b_individual_overlap_sample_sizes.r**: This comprises code....
+**1b_individual_overlap_sample_sizes.r**: for example datasets, calculate among-individual spatial overlap and then predict a coarse value of the minimum sample size required based on the average BA (Bhattacharyya's affinity) value. 
 
 
 ### 2) Reproducing analyses from the paper
