@@ -94,6 +94,7 @@ p_ap10 <- ggplot() + geom_path(data = ap_grat, aes(x = x , y = y, group = sfg_id
   coord_fixed(ratio = 1, xlim = c(-101, -37), ylim = c(-57, -33))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow")  
 p_ap10
+
 out.name <- paste0(plot_direx, "4_ap10.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -109,6 +110,7 @@ p_ap11 <- ggplot() + geom_path(data = ap_grat, aes(x = x , y = y, group = sfg_id
   coord_fixed(ratio = 1, xlim = c(-101, -37), ylim = c(-57, -33))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_ap11
+
 out.name <- paste0(plot_direx, "4_ap11.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -127,6 +129,7 @@ p_bba02 <- ggplot() + geom_path(data = bba_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-60, 141), ylim = c(-58, -11))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 2.8, fill = "yellow") 
 p_bba02
+
 out.name <- paste0(plot_direx, "4_bba02.png")
 ggsave(out.name, dpi = 600, width = 5500, height = 5500, units = "px")
 dev.off()
@@ -142,6 +145,7 @@ p_bba03 <- ggplot() + geom_path(data = bba_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-60, 141), ylim = c(-58, -11))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 2.8, fill = "yellow")
 p_bba03
+
 out.name <- paste0(plot_direx, "4_bba03.png")
 ggsave(out.name, dpi = 600, width = 5500, height = 5500, units = "px")
 dev.off()
@@ -160,6 +164,7 @@ p_bp11 <- ggplot() + geom_path(data = bp11_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-170, 10), ylim = c(-70, -38))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_bp11
+
 out.name <- paste0(plot_direx, "4_bp11.png")
 ggsave(out.name, dpi = 600, width = 5500, height = 5500, units = "px")
 dev.off()
@@ -178,6 +183,7 @@ p_bs02 <- ggplot() + geom_path(data = bs02_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-66, -19), ylim = c(-67, -24))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 4.8, fill = "yellow") 
 p_bs02
+
 out.name <- paste0(plot_direx, "4_bs02.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -196,6 +202,7 @@ p_bs12 <- ggplot() + geom_path(data = bs12_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-66, 27), ylim = c(-67, -24))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 2.8, fill = "yellow") 
 p_bs12
+
 out.name <- paste0(plot_direx, "4_bs12.png")
 ggsave(out.name, dpi = 600, width = 3500, height = 3500, units = "px")
 dev.off()
@@ -214,6 +221,7 @@ p_gha99 <- ggplot() + geom_path(data = gha99_grat, aes(x = x , y = y, group = sf
   coord_fixed(ratio = 1, xlim = c(-146, 120), ylim = c(-70, -28))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3.3, fill = "yellow") 
 p_gha99
+
 out.name <- paste0(plot_direx, "4_gha99.png")
 ggsave(out.name, dpi = 600, width = 6000, height = 6000, units = "px")
 dev.off()
@@ -232,6 +240,7 @@ p_lma04 <- ggplot() + geom_path(data = lma_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-70, 110), ylim = c(-70, -38))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_lma04
+
 out.name <- paste0(plot_direx, "4_lma04.png")
 ggsave(out.name, dpi = 600, width = 5500, height = 5500, units = "px")
 dev.off()
@@ -247,6 +256,7 @@ p_lma05 <- ggplot() + geom_path(data = lma_grat, aes(x = x , y = y, group = sfg_
   coord_fixed(ratio = 1, xlim = c(-70, 110), ylim = c(-70, -38))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_lma05
+
 out.name <- paste0(plot_direx, "4_lma05.png")
 ggsave(out.name, dpi = 600, width = 5500, height = 5500, units = "px")
 dev.off()
@@ -262,6 +272,7 @@ p_ngp <- ggplot() + geom_path(data = bs02_grat, aes(x = x , y = y, group = sfg_i
   coord_fixed(ratio = 1, xlim = c(-66, -19), ylim = c(-67, -24))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 4.8, fill = "yellow") 
 p_ngp
+
 out.name <- paste0(plot_direx, "4_ngp00.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -277,6 +288,7 @@ p_sgp <- ggplot() + geom_path(data = bs12_grat, aes(x = x , y = y, group = sfg_i
   coord_fixed(ratio = 1, xlim = c(-66, 27), ylim = c(-67, -24))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 2.8, fill = "yellow") 
 p_sgp
+
 out.name <- paste0(plot_direx, "4_sgp00.png")
 ggsave(out.name, dpi = 600, width = 3500, height = 3500, units = "px")
 dev.off()
@@ -299,6 +311,7 @@ p_wa04 <- ggplot() + geom_path(data = wa_grat, aes(x = x , y = y, group = sfg_id
   coord_fixed(ratio = 1, xlim = c(-5500000, 5800000), ylim = c(-5300000, 5500000))+
   geom_point(data = col_proj, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow")
 p_wa04
+
 out.name <- paste0(plot_direx, "4_wa04.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -315,6 +328,7 @@ p_wa08 <- ggplot() + geom_path(data = wa_grat, aes(x = x , y = y, group = sfg_id
   coord_fixed(ratio = 1, xlim = c(-5500000, 5800000), ylim = c(-5300000, 5500000))+
   geom_point(data = col_proj, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow")
 p_wa08
+
 out.name <- paste0(plot_direx, "4_wa08.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -331,6 +345,7 @@ p_wa09 <- ggplot() + geom_path(data = wa_grat, aes(x = x , y = y, group = sfg_id
   coord_fixed(ratio = 1, xlim = c(-5500000, 5800000), ylim = c(-5300000, 5500000))+
   geom_point(data = col_proj, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow")
 p_wa09
+
 out.name <- paste0(plot_direx, "4_wa09.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -346,6 +361,7 @@ p_wcp03 <- ggplot() + geom_path(data = ap_grat, aes(x = x , y = y, group = sfg_i
   coord_fixed(ratio = 1, xlim = c(-101, -37), ylim = c(-57, -26))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_wcp03
+
 out.name <- paste0(plot_direx, "4_wcp03.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()
@@ -361,6 +377,7 @@ p_wcp13 <- ggplot() + geom_path(data = ap_grat, aes(x = x , y = y, group = sfg_i
   coord_fixed(ratio = 1, xlim = c(-101, -37), ylim = c(-57, -26))+
   geom_point(data = col_dec, aes(x = x, y = y),  pch = 24, size = 3, fill = "yellow") 
 p_wcp13
+
 out.name <- paste0(plot_direx, "4_wcp13.png")
 ggsave(out.name, dpi = 600, width = 3000, height = 3000, units = "px")
 dev.off()

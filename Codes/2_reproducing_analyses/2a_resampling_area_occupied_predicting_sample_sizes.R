@@ -42,14 +42,14 @@ out_direx <- "./Data_outputs/resampled_area_outputs/gls_data/"
 for (i in 1:length(f)) {
   print(paste(in_df[[i]]$species[1], in_df[[i]]$year[1], sep = "_"))
   # resampling 50% UD
-  res_50 <- resampling_UD_area(x = in_df[[i]], n_iter = 100, 
+  res_50 <- resampling_UD_area(x = in_df[[i]], n_iter = 1000, 
                                 iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
                                 proj_out = proj_utm, n_core = 6)
   # pasting out 50% UD iterations
   out_name <- paste0(out_direx, in_df[[i]]$species[1], substr(in_df[[i]]$year[1], 3, 4), "_", "50.csv")
   #write.csv(res_50, out_name)
   # resampling 95% UD
-  res_95 <- resampling_UD_area(x = in_df[[i]], n_iter = 100, 
+  res_95 <- resampling_UD_area(x = in_df[[i]], n_iter = 1000, 
                                 iso_level = 95, cellsize = 50000, h = 186000, proj_in = proj_dec,
                                 proj_out = proj_utm, n_core = 6)
   # pasting out 95% UD iterations
@@ -110,11 +110,11 @@ for (i in 1:length(f_50)) {
 all_aics_50 <- do.call(rbind, out_aics_50)
 all_preds_50 <- do.call(rbind, out_preds_50)
 
-# paste out AICs and minimum sample sizes
+# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
 out_name <- paste0(out_direx, "area_occupied_50_aics.csv")
-write.csv(all_aics_50, out_name)
+#write.csv(all_aics_50, out_name)
 out_name <- paste0(out_direx, "area_occupied_50_predictions.csv")
-write.csv(all_preds_50, out_name)
+#write.csv(all_preds_50, out_name)
 
 # identifying best model for each dataset
 aic_best <- all_aics_50 %>%
@@ -124,12 +124,12 @@ aic_best
 nrow(aic_best[aic_best$model == "MM3",])
 # 13 of 21 have MM3 as best model
 
-# pasting out MM3 models for each dataset
+# pasting out MM3 models for each dataset - - DON'T PASTE OUT FOR NOW
 out_mod <- "./Data_outputs/resampled_area_outputs/gls_models/"
 for (i in 1:length(f_50)) {
   out_name <- paste0(out_mod, gsub(".csv", "", f_50[i]), ".RData")
   mod <- mod_mm3_50[[i]]
-  save(mod, file = out_name)
+  #save(mod, file = out_name)
 }
 
 
@@ -177,11 +177,11 @@ for (i in 1:length(f_95)) {
 all_aics_95 <- do.call(rbind, out_aics_95)
 all_preds_95 <- do.call(rbind, out_preds_95)
 
-# paste out AICs and minimum sample sizes
+# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
 out_name <- paste0(out_direx, "area_occupied_95_aics.csv")
-write.csv(all_aics_95, out_name)
+#write.csv(all_aics_95, out_name)
 out_name <- paste0(out_direx, "area_occupied_95_predictions.csv")
-write.csv(all_preds_95, out_name)
+#write.csv(all_preds_95, out_name)
 
 # identifying best model for each dataset
 aic_best <- all_aics_95 %>%

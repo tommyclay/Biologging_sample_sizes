@@ -2,7 +2,6 @@ library(ggplot2)
 
 plot_direx <- "./Plots/"
 
-
 #### 1. LOAD IN AND PREPARE DATA ####
 
 # much of this section is copied from 2f.

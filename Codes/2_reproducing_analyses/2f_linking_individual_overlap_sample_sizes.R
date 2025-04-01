@@ -29,7 +29,7 @@ y = all_preds$prediction
 model <- nls(y ~ k/log(1-x), start = list(k = -10)) 
 summary(model)
 # Parameters:
-# Estimate Std. Error t value Pr(>|t|)    
+#     Estimate Std. Error t value Pr(>|t|)    
 # k  -3.9926     0.2263  -17.64   <2e-16 ***
 
 # predicting and including on plot

@@ -1,13 +1,13 @@
 library(plyr)
 library(raster)
 library(terra)
-#library(ks)
 library(progress)
 library(future.apply)
 library(raster)
 library(sf)
 library(adehabitatHR)
 library(future.apply)
+library(ggplot2)
 
 #### 1. LOAD FUNCTIONS #####
 
@@ -73,7 +73,6 @@ write.csv(gha_run, out.name)
 wa_run <- resampling_fisheries_overlap(x = wa, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
                                         threat_df = fish_df, grid_res = 2, n_cores = 4, 
                                         proj_utm = proj_utm, proj_dec = proj_dec) 
-# X for 1000 iterations/4 cores
 
 # plotting output
 ggplot(wa_run, aes(sample, overlap)) + geom_line(aes(group = iteration))
@@ -89,7 +88,6 @@ write.csv(wa_run, out.name)
 wcp_run <- resampling_fisheries_overlap(x = wcp, n_iter = 1000, UD_cell = 50000, UD_h = 186000, 
                                        threat_df = fish_df, grid_res = 2, n_cores = 4, 
                                        proj_utm = proj_utm, proj_dec = proj_dec) 
-# X for 1000 iterations/4 cores
 
 # plotting output
 ggplot(wcp_run, aes(sample, overlap)) + geom_line(aes(group = iteration))

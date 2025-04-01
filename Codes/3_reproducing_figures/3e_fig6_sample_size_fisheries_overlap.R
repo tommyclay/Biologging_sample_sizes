@@ -30,7 +30,7 @@ p_bba <- ggplot(bba, aes(sample, overlap)) + geom_line(aes(group = as.factor(ite
 p_bba
 
 # 2. plotting change in overlap
-p_bba_c <- ggplot(bba_2, aes(sample, o_change_p)) + geom_line(aes(group = as.factor(iteration)),linewidth = 0.3, col = "grey80")+
+p_bba_c <- ggplot(bba, aes(sample, o_change_p)) + geom_line(aes(group = as.factor(iteration)),linewidth = 0.3, col = "grey80")+
   stat_summary(fun=mean, colour="blue", geom="line", size = 0.5) + theme_bw() +
   geom_point(data = bba_med, aes(x = sample, y = o_change_med), pch = 21, size= 0.9) + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -52,7 +52,7 @@ gha$o_change_p[is.na(gha$o_change_p) == FALSE & gha$o_change_p<0] <- gha$o_chang
 gha_med <- ddply(gha,.(sample), summarize, overlap_med = median(overlap), o_change_med = median(o_change_p))
 gha <- subset(gha, iteration <= 100,)
 gha_5 <- subset(gha_med,  o_change_med <= 5,)
-gha_5$sample[1] # 14
+gha_5$sample[1] # 13
 
 # 1. plotting overlap
 p_gha <- ggplot(gha, aes(sample, overlap)) + geom_line(aes(group = as.factor(iteration)),linewidth = 0.3, col = "grey80")+
@@ -90,7 +90,7 @@ wa_med <- ddply(wa,.(sample), summarize, overlap_med = median(overlap), o_change
 wa <- subset(wa, iteration <= 100,)
 # getting first median value <= 5%
 wa_5 <- subset(wa_med,  o_change_med <= 5,)
-wa_5$sample[1] # 11 
+wa_5$sample[1] # 11
 
 # 1. plotting raw overlap
 p_wa <- ggplot(wa, aes(sample, overlap)) + geom_line(aes(group = as.factor(iteration)), linewidth = 0.3, col = "grey80")+

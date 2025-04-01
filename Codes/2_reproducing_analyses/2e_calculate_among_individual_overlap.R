@@ -29,7 +29,7 @@ proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 out_df <- data.frame(dataset = gsub(".csv", "", f), species = NA, year = NA, ba = NA)
 for (i in 1:length(f)) {
   print(gsub(".csv", "", f[i]))
-  ba <- pairwise_BA_overlap(x = in_df[[i]], h = 186000, cellsize = 50000, iso = 50, proj_in = proj_dec, proj_out = proj_utm)
+  ba <- pairwise_BA_overlap(x = in_df[[i]], h = 186000, cellsize = 50000, iso_level = 50, proj_in = proj_dec, proj_out = proj_utm)
   out_df$ba[i] <- mean(ba) 
   out_df$species[i] <- in_df[[i]]$species[1]
   if (grepl("both", f[i])) {

@@ -47,7 +47,7 @@ for (i in 1:length(f)) {
 all_out <- do.call(rbind, out_l)
 
 
-#### 3. PASTE OUT ####
+#### 3. PASTE OUT - DON'T PASTE OUT FOR NOW ####
 
 out_name <- "./Data_outputs/birdlife_predictions.csv"
-write.csv(all_out, out_name)
+# write.csv(all_out, out_name)

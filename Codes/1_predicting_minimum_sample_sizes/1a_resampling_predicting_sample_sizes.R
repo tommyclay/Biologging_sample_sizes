@@ -1,219 +1,123 @@
-library(sf)
-library(terra)
-library(parallel)
 library(adehabitatHR)
+library(sf)
+library(raster)
+library(future.apply)
+library(parallel)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(pbapply)
 library(compiler)
-
 library(drc)
 
-#### 1. SPECIFYING FUNCTIONS - IN FUTURE THIS WILL BE IN SEPARATE R FILE WE CAN LINK TO #####
+#### 1. LOAD FUNCTIONS #####
 
-# 1. FUNCTION TO RESAMPLE HOME RANGE AREA OCCUPIED 
+source("./Codes/1_predicting_minimum_sample_sizes/functions.R")
 
-# function to project from dec to utm
-proj_fun <- function(df_in, proj_in, proj_out) {
-  # Convert to sf object
-  df_sf <- st_as_sf(df_in, coords = c("Longitude", "Latitude"), crs = proj_in)
-  # Transform projection
-  df_out <- st_transform(df_sf, crs = proj_out)
-  # Extract coordinates and rename to Longitude & Latitude
-  coords <- st_coordinates(df_out)
-  colnames(coords) <- c("Longitude", "Latitude")
-  # Convert back to data frame (if needed, with coordinates extracted)
-  df_out <- cbind(st_drop_geometry(df_out), coords)
-  return(df_out)
-}
+#### 2. LOADING IN EXAMPLE DATASETS ####
 
-# if utm, put smoothing factor in metres not km
-resampling_UD_area <- function(x, n_iter, iso_level, cellsize, h, proj_in, proj_out, n_core, verbose = TRUE) {
-  # re-projecting to utm to calculate kernel, if needed
-  if (proj_in != proj_out) {
-    x <- proj_fun(df_in = x, proj_in = proj_in, proj_out = proj_out) 
-  } else { proj_out <- proj_in }
-  
-  if (verbose) start_time <- Sys.time()
-  
-  # pre-calculate constants
-  h_m <- h            # smoothing factor in meters
-  buffer <- h_m * 2          # buffer distance
-  cellsize_m <- cellsize
-  
-  # 1. SETTING UP NULL GRID (terra + sf)
-  bbox <- st_bbox(c(
-    xmin = min(x$longitude) - buffer,
-    xmax = max(x$longitude) + buffer,
-    ymin = min(x$latitude)  - buffer,
-    ymax = max(x$latitude)  + buffer
-  ), crs = st_crs(proj_out))
-  # Create empty raster grid
-  grid_raster <- raster(xmn = bbox["xmin"], xmx = bbox["xmax"],
-    ymn = bbox["ymin"], ymx = bbox["ymax"],
-    resolution = cellsize_m,crs = proj_out)
-  
-  # 2. CALCULATE KERNELS & MATRICES PER INDIVIDUAL
-  id_levels <- levels(as.factor(as.character(x$Id)))
-  n_levels <- length(id_levels)
-  kern_in <- vector("list", n_levels)
-  matrix_in <- vector("list", n_levels)
-  names(kern_in) <- names(matrix_in) <- id_levels
-  
-  for (j in seq_along(id_levels)) {
-    id_sub <- x[x$Id == id_levels[j], ]
-    lox <- id_sub[, c("Longitude", "Latitude")]
-    coordinates(lox) <- ~ longitude + latitude
-    kern_in[[j]] <- kernelUD(lox, grid = null.grid, h = h_m)
-    matrix_in[[j]] <- as.matrix(raster(kern))
-    kern_in[[j]] <- kern
-  }
-  
-  # 3. ITERATION FUNCTION (optimized inner loop)
-  iteration_func <- function(i) {
-    set.seed(i)  # For reproducibility
-    random_ids <- sample(id_levels, n_levels, replace = FALSE)
-    # Get indices once:
-    idxs <- match(random_ids, names(matrix_in))
-    tot_v <- numeric(n_levels)
-    
-    running_sum <- matrix_in[[ idxs[1] ]]
-    kern_base <- kern_in[[ idxs[1] ]]
-    iso <- getverticeshr(kern_base, percent = iso_level)
-    tot_v[1] <- as.numeric(st_area(st_as_sf(iso)))
-    
-    for (a in 2:n_levels) {
-      running_sum <- running_sum + matrix_in[[ idxs[a] ]]
-      avg_matrix <- running_sum / a
-      
-      # Copy and update the kernel object (S4 copying overhead is minimized here)
-      kern_new <- kern_base
-      kern_new@data$ud <- as.vector(avg_matrix)
-      iso_new <- getverticeshr(kern_new, percent = iso_level)
-      tot_v[a] <- as.numeric(st_area(st_as_sf(iso_new)))
-    }
-    
-    data.frame(
-      Sample = seq_len(n_levels),
-      Tot_area = tot_v,
-      Isopleth = iso_level,
-      Iteration = i
-    )
-  }
-  
-  # Compile the iteration function for a speed boost
-  iteration_func <- cmpfun(iteration_func)
-  
-  if (verbose) message("Starting resampling iterations...")
-  
-  # 4. SET UP CLUSTER AND EXPORT NECESSARY OBJECTS & PACKAGES
-  cl <- makeCluster(n_core)
-  clusterEvalQ(cl, {
-    library(adehabitatHR)
-    library(raster)
-    library(sf)
-  })
-  # Export required variables and functions to each worker:
-  clusterExport(cl, varlist = c("id_levels", "matrix_in", "kern_in", "iso_level", 
-                                "gArea", "getverticeshr"), envir = environment())
-  
-  # 5. RUN PARALLEL ITERATIONS
-  result_list <- parLapply(cl, seq_len(n_iter), iteration_func)
-  stopCluster(cl)
-  result <- do.call(rbind, result_list)
-  
-  # 6. POST-PROCESSING: Convert areas from m² to km²
-  result$Tot_area <- result$Tot_area / 1e6
-  
-  if (verbose) {
-    end_time <- Sys.time()
-    total_time <- end_time - start_time
-    message(paste0("Resampling completed in ", round(total_time, 2), " ", attr(total_time, "units")))
-  }
-  
-  return(result)
-}
+in_direx <- "./Data_inputs/gls_data/"
 
-# 2. FUNCTION TO RUN ASYMPTOTIC MODELS 
-# sample size should be "x", y should be "area". 
-run_asymptotic_model <- function(x, type, start) {
-  if (type == "MM2") { form = "MM.2()"
-  } else if (type == "MM3") { form = "MM.3()"
-  } else if (type == "AR2") { form = "AR.2()"
-  } else if (type == "AR3") { form = "AR.3()" }
-  mod <- drm(area ~ x, data = x, fct = type)
-}
+# grey-headed albatrosses tracked in 1999-2000
+gha <- read.csv(paste0(in_direx, "gha99.csv"))
 
-# NEED TO MODIFY THIS CODE!!!
-run_asymptotic_model2 <- function(x, type, start = NULL) {
-  
-  # Determine the model function and default start values based on type
-  if (type == "MM2") {
-    model_func <- MM.2()
-    if (is.null(start)) start <- c(a = max(x$area), b = 1)
-  } else if (type == "MM3") {
-    model_func <- MM.3()
-    if (is.null(start)) start <- c(a = max(x$area), b = 1, c = 0)
-  } else if (type == "AR2") {
-    model_func <- AR.2()
-    if (is.null(start)) start <- c(a = max(x$area), b = 1)
-  } else if (type == "AR3") {
-    model_func <- AR.3()
-    if (is.null(start)) start <- c(a = max(x$area), b = 1, c = 0)
-  } else {
-    stop("Invalid model type specified.")
-  }
-  
-  # Fit model
-  mod <- drm(area ~ x, data = x, fct = model_func, start = start)
-  
-  return(mod)
-}
+# white-chinned petrels tracked in 2003
+wcp <- read.csv(paste0(in_direx, "wcp03.csv"))
 
 
-# 3. FUNCTION TO PREDICT MINIMUM SAMPLE SIZE
+#### 3. RESAMPLING AND PASTING OUT DATASETS ####
 
-# can specify multiple pop sizes
-sample_prediction <- function(model, pop_size, percent_cover) {
-  
-  pred.ci <- lapply(seq_along(pop_size), function(i) {
-    # Create data frame for sampling
-    pred.df <- data.frame(sample = seq_len(pop_size[i]), groupings = 1)
-    # Get prediction results with confidence intervals
-    pred.df2 <- as.data.frame(predict(model, newdata = pred.df, se.fit = FALSE, interval = "confidence", level = 0.95))
-    # Directly get max values
-    max.value.mean  <- max(pred.df2$Prediction)
-    max.value.upper <- max(pred.df2$Upper)
-    max.value.lower <- max(pred.df2$Lower)
-    # Calculate threshold values related to percent cover
-    value.mean  <- max.value.mean  * percent_cover
-    value.upper <- max.value.upper * percent_cover
-    value.lower <- max.value.lower * percent_cover
-    # Find the first value greater than or equal to the threshold using logical indexing
-    number.mean  <- which(pred.df2$Prediction >= value.mean)[1]
-    number.upper <- which(pred.df2$Upper >= value.upper)[1]
-    number.lower <- which(pred.df2$Lower >= value.lower)[1]
-    # If thresholds are not met, use the maximum sample size
-    number.mean  <- ifelse(is.na(number.mean),  pop_size[i], number.mean)
-    number.upper <- ifelse(is.na(number.upper), pop_size[i], number.upper)
-    number.lower <- ifelse(is.na(number.lower), pop_size[i], number.lower)
-    # Return the results as a data frame
-    data.frame(
-      Prediction = number.mean,
-      Upper      = number.upper,
-      Lower      = number.lower,
-      Predict.To = pop_size[i]
-    )
-  })
-  # Combine all results into one data frame
-  predict.df <- do.call(rbind, pred.ci)
-  return(predict.df)
-}
+# set projections
+# for gha, lambert azimuthal equal area projection centred around south pole
+proj_gha <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
+# for gha, lambert azimuthal equal area projection centred around median lon and lat
+proj_wcp <- paste0("+proj=laea +lat_0=", median(wcp$latitude), " +lon_0=", median(wcp$longitude), " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+# WGS84 projection
+proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
+
+# resampling for 50% UD - for 500 iterations as an example (recommend using 1,000+ for final run)
+# 50 km grid cell size and 186 km smoothing factor for GLS data (change based on type of biologging data)
+
+set.seed(123) # for reproducibility 
+
+# GHA
+gha_res <- resampling_UD_area(x = gha, n_iter = 500, 
+                             iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
+                             proj_out = proj_gha, n_core = 6)
+ggplot(gha_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+
+# WCP 
+wcp_res <- resampling_UD_area(x = wcp, n_iter = 500, 
+                                 iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
+                                 proj_out = proj_wcp, n_core = 6)
+ggplot(wcp_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+
+#### 4. RUN ASYMPTOTIC MODELS AND COMPARE AIC ####
+
+# GHA 
+gha_res$x <- gha_res$sample
+gha_res$area <- gha_res$tot_area
+gha_mm2 <- run_asymptotic_model(dat = gha_res, type = "MM2")
+gha_mm3 <- run_asymptotic_model(dat = gha_res, type = "MM3")
+gha_ar2 <- run_asymptotic_model(dat = gha_res, type = "AR2")
+gha_ar3 <- run_asymptotic_model(dat = gha_res, type = "AR3")
+# compare AICs
+gha_aics <- AIC(gha_mm2, gha_mm3, gha_ar2, gha_ar3)
+gha_aics$model <- c("MM2", "MM3", "AR2", "AR3")
+gha_aics <- gha_aics[order(gha_aics$AIC),]
+gha_aics$dAIC <- gha_aics$AIC-gha_aics$AIC[1]
+gha_aics
+#         df      AIC model      dAIC
+# gha_mm3  4 330233.7   MM3   0.00000
+# gha_mm2  3 330246.7   MM2  13.05636
+# gha_ar3  4 330322.4   AR3  88.74593
+# gha_ar2  3 330692.8   AR2 459.10652
+
+# MM2 model is best
+
+plot(gha_mm3)
+# looks good
+
+# WCP 
+wcp_res$x <- wcp_res$sample
+wcp_res$area <- wcp_res$tot_area
+wcp_mm2 <- run_asymptotic_model(dat = wcp_res, type = "MM2")
+wcp_mm3 <- run_asymptotic_model(dat = wcp_res, type = "MM3")
+wcp_ar2 <- run_asymptotic_model(dat = wcp_res, type = "AR2")
+wcp_ar3 <- run_asymptotic_model(dat = wcp_res, type = "AR3")
+# compare AICs
+wcp_aics <- AIC(wcp_mm2, wcp_mm3, wcp_ar2, wcp_ar3)
+wcp_aics$model <- c("MM2", "MM3", "AR2", "AR3")
+wcp_aics <- wcp_aics[order(wcp_aics$AIC),]
+wcp_aics$dAIC <- wcp_aics$AIC-wcp_aics$AIC[1]
+wcp_aics
+#         df    AIC   model    dAIC
+# wcp_mm3  4 138061.3   MM3  0.000000
+# wcp_ar3  4 138066.3   AR3  5.025178
+# wcp_ar2  3 138089.2   AR2 27.899487
+# wcp_mm2  3 138098.0   MM2 36.695000
+
+# MM3 model best
+
+plot(wcp_mm3)
+# looks good
 
 
 
+#### 5. PREDICT MINIMUM SAMPLE SIZES FOR A GIVEN POPULATION SIZE ####
 
+# just predicting to a population size of 100 for now
 
-#### 2. RUNNING ON EXAMPLE CODE ####
+# GHA 
+gha_pred <- sample_prediction(model = gha_mm3, pop_size = 100, percent_cover = 95)
+gha_pred
+#    prediction lower upper pop_size
+#          19    18    20      100
 
-# 
-
-
-
+# WCP
+wcp_pred <- sample_prediction(model = wcp_mm3, pop_size = 100, percent_cover = 95)
+wcp_pred
+#    prediction lower upper pop_size
+#          17    16    18      100

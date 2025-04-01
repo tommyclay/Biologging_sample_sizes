@@ -2,14 +2,13 @@ library(ggplot2)
 library(plyr)
 library(cowplot)
 
-
 # setting up directories
 resample_direx <- "./Data_outputs/resampled_area_outputs/gls_data/"
 model_direx <- "./Data_outputs/resampled_area_outputs/gls_models/"
 plot_direx <- "./Plots/"
 
 # loading in minimium sample sizes from models
-min_sample <- read.csv(paste0(in_direx, "area_occupied_50_predictions.csv"))
+min_sample <- read.csv("./Data_outputs/area_occupied_50_predictions.csv")
 min_sample <- subset(min_sample, model == "MM3" & pop_size == 100,)
 
 #### 1. PLOTTING FOR EACH YEAR COMBINATION ####
@@ -496,6 +495,7 @@ wcp03_p <- ggplot() + geom_line(data = wcp03, aes(x = sample, y = tot_area, grou
   scale_x_continuous(breaks = seq(0, max(wcp03$sample), 1)) 
   #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCP03"], linetype="dotted")
 wcp03_p
+
 
 ##### 1S. WCP 2013 #####
 

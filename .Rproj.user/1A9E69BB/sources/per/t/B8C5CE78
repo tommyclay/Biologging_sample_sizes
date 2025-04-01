@@ -1,0 +1,27 @@
+{
+    "id": "B8C5CE78",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/1b_individual_overlap_sample_sizes.R",
+    "project_path": "Codes/1_predicting_minimum_sample_sizes/1b_individual_overlap_sample_sizes.R",
+    "type": "r_source",
+    "hash": "1170811313",
+    "contents": "",
+    "dirty": false,
+    "created": 1743532742443.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "47,22",
+        "scrollLine": "32"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1743536494,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743536494488,
+    "read_only": false,
+    "read_only_alternatives": []
+}

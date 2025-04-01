@@ -38,7 +38,7 @@ proj_utm <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +uni
 proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
 
 
-#### 3. RANDOMLY SAMPLE DATASETS AT DIFFERENT SAMPLE SIZE INTERVALS AND RUN RESAMPLING CODE  - DON'T ACTUALLY PASTE OUT FOR NOW ####
+#### 3. RANDOMLY SAMPLE DATASETS AT DIFFERENT SAMPLE SIZE INTERVALS AND RUN RESAMPLING CODE  - DON'T PASTE OUT FOR NOW ####
 
 # set seed
 set.seed(512)
@@ -67,8 +67,8 @@ for (i in 1:length(f)) {
                                    iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
                                    proj_out = proj_utm, n_core = 6)
     # pasting out
-    #out_name <- paste0(out_direx, in_df[[i]]$species[1], substr(in_df[[i]]$year[1], 3, 4), "_", n_sample[a], "ind.csv")
-    write.csv(res_out, out_name)
+    out_name <- paste0(out_direx, in_df[[i]]$species[1], substr(in_df[[i]]$year[1], 3, 4), "_", n_sample[a], "ind.csv")
+    #write.csv(res_out, out_name)
   }
 }
 
