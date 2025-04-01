@@ -1,0 +1,26 @@
+{
+    "id": "2036A96D",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/3_reproducing_figures/3a_fig2_asymptotic_plots.R",
+    "project_path": "Codes/3_reproducing_figures/3a_fig2_asymptotic_plots.R",
+    "type": "r_source",
+    "hash": "1293825602",
+    "contents": "",
+    "dirty": false,
+    "created": 1743525484819.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "563,9",
+        "scrollLine": "428"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1743283499,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743283499,
+    "read_only": false,
+    "read_only_alternatives": []
+}

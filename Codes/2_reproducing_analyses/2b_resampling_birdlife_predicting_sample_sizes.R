@@ -1,7 +1,5 @@
 library(track2KBA)
-#library(maptools)
 library(adehabitatHR)
-#library(plyr)
 library(sf)
 
 #### 1. SET UP DIRECTORY AND PROJECTIONS ####

@@ -1,0 +1,26 @@
+{
+    "id": "97577964",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/functions.R",
+    "project_path": "Codes/1_predicting_minimum_sample_sizes/functions.R",
+    "type": "r_source",
+    "hash": "1652102659",
+    "contents": "",
+    "dirty": false,
+    "created": 1743523337504.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "447,0",
+        "scrollLine": "257"
+    },
+    "folds": "22|110|114|0|\n129|45|156|0|\n165|63|205|0|\n213|79|234|0|\n245|35|248|0|\n256|118|382|0|\n396|57|410|0|\n413|56|441|0|\n",
+    "lastKnownWriteTime": 1743525643,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743525643148,
+    "read_only": false,
+    "read_only_alternatives": []
+}

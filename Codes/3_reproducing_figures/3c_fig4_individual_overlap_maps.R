@@ -5,68 +5,15 @@ library(sfheaders)
 library(ggplot2)
 library(graticule)
 
-#### 1. SETTING UP FUNCTIONS #### UPDATE WITH NEW FUNCTIONS ######
+#### 1. LOAD FUNCTIONS #####
 
-# projection formats - utm coordinates centered around South Pole
-proj_utm <- paste0("+proj=laea +lat_0=", -90, " +lon_0=", -38.05, " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
-proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
-# function to project from dec to utm
-proj_fun <- function(df_in, proj_in, proj_out) {
-  coordinates(df_in) <- ~longitude+latitude
-  proj4string(df_in) <- proj_in
-  df_out <- spTransform(df_in, CRS(proj_out))
-  df_out <- data.frame(df_out)
-  return(df_out)
-}
-# calculate individual kernels
-ind_kernels_poly <- function(x, h, cellsize, iso_level) {
-  # calculating null grid
-  coordinates(x) <- ~ longitude+latitude
-  null.grid <- expand.grid(x=seq(min(coordinates(x)[,1])-(h*1000*2), max(coordinates(x)[,1])+(h*1000*2), by = cellsize*1000),
-                           y=seq(min(coordinates(x)[,2])-(h*1000*2), max(coordinates(x)[,2])+(h*1000*2), by = cellsize*1000))
-  coordinates(null.grid) <- ~x+y
-  gridded(null.grid) <- TRUE
-  # calculating all individual kernels
-  lox <- data.frame(x= x$longitude, y = x$latitude, id = x$id)
-  coordinates(lox) <-  ~x + y
-  kerns <- kernelUD(lox, grid = null.grid, h = h*1000, same4all = FALSE)
-  # getting isopleths
-  isos <- getverticeshr(x = kerns, percent = iso_level)
-  return(isos)
-}
-# calculate population kernels
-pop_kernel_poly <- function(x, h, cellsize, iso_level) {
-  
-  # 1. SETTING UP NULL GRID - using buffer of 2 times the smoothing factor around min and max points 
-  null.grid <- expand.grid(x=seq(min(x$longitude)-(h*1000*2), max(x$longitude)+(h*1000*2), by = cellsize*1000),
-                           y=seq(min(x$latitude)-(h*1000*2), max(x$latitude)+(h*1000*2), by = cellsize*1000))
-  coordinates(null.grid) <- ~x+y
-  gridded(null.grid) <- TRUE
-  
-  # 2. CALCULATE KERNELS FOR EACH INDIVIDUAL AND TURN TO MATRICES (TO AVERAGE ACROSS LATER)
-  kern_in <- list()
-  matrix_in <- list()
-  x$Id <- as.factor(as.character(x$id))
-  for (j in 1:nlevels(x$id)) {
-    id.sub <- subset(x, id==levels(x$id)[j])   
-    id.sub$Id <- as.factor(as.character(id.sub$id))
-    lox <- id.sub[,c("longitude", "latitude")]
-    coordinates(lox) <-  ~longitude + latitude
-    kern_in[[j]] <- adehabitatHR::kernelUD(lox, grid = null.grid, h = h*1000)
-    matrix_in[[j]] <- as.matrix(raster(kern_in[[j]]))
-  }
-  
-  # 3. MERGE AND PASTE OUT
-  kern_out <- kern_in[[1]]
-  matrix.summed <- Reduce('+', matrix_in)
-  matrix.summed2 <- matrix.summed/length(kern_in)
-  kern_out@data$ud <- as.vector(matrix.summed2)
-  iso_out <- getverticeshr(kern_out, percent = iso_level)
-  return(iso_out)
-}
-
+source("./Codes/1_predicting_minimum_sample_sizes/functions.R")
 
 #### 2. CALCULATING INDIVIDUAL AND POPULATION KERNELS FOR EACH DATASET ####
+
+# setting projections
+proj_utm <- paste0("+proj=laea +lat_0=", -90, " +lon_0=", -38.05, " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
 
 # setting up directory
 in_direx <- "./Data_inputs/gls_data/"
@@ -85,7 +32,7 @@ for (i in 1:length(f)) {
   dat <- read.csv(paste0(in_direx, f[i]))
   dat$id <- as.factor(as.character(dat$id))
   # reproject
-  dat_proj <- proj_fun(df_in = dat, proj_in = proj_dec, proj_out = proj_utm) 
+  dat_proj <- proj_fun(x = dat, proj_in = proj_dec, proj_out = proj_utm) 
   # calculate population kernels
   dat_pop <- pop_kernel_poly(x = dat_proj, h = 186, cellsize = 50, iso_level = 50)
   # calculate individual kernels

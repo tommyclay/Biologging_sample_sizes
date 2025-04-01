@@ -1,0 +1,26 @@
+{
+    "id": "04690B98",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/3_reproducing_figures/3c_fig4_individual_overlap_maps.R",
+    "project_path": "Codes/3_reproducing_figures/3c_fig4_individual_overlap_maps.R",
+    "type": "r_source",
+    "hash": "1089057454",
+    "contents": "",
+    "dirty": false,
+    "created": 1743525500768.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "11,0",
+        "scrollLine": "17"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1743525657,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743525657932,
+    "read_only": false,
+    "read_only_alternatives": []
+}

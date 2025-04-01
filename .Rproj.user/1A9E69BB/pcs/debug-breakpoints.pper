@@ -15,36 +15,6 @@
                 "type": 0,
                 "is_package_breakpoint": false,
                 "package_name": ""
-            },
-            {
-                "id": 14,
-                "path": "~/GitHub/Biologging_sample_sizes/Codes/3_reproducing_figures/3c_fig4_individual_overlap_maps.R",
-                "line_number": 8,
-                "function_steps": "",
-                "function_name": "toplevel",
-                "state": 1,
-                "editor_state": 1,
-                "editor_line_number": 8,
-                "is_pending_debug_completion": false,
-                "needs_updated_steps": false,
-                "type": 1,
-                "is_package_breakpoint": false,
-                "package_name": ""
-            },
-            {
-                "id": 18,
-                "path": "~/GitHub/Biologging_sample_sizes/Codes/2_reproducing_analyses/2g_resampling_fisheries_overlap.R",
-                "line_number": 139,
-                "function_steps": "",
-                "function_name": "toplevel",
-                "state": 1,
-                "editor_state": 1,
-                "editor_line_number": 139,
-                "is_pending_debug_completion": false,
-                "needs_updated_steps": false,
-                "type": 1,
-                "is_package_breakpoint": false,
-                "package_name": ""
             }
         ]
     }
