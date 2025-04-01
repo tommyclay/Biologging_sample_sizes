@@ -75,7 +75,7 @@ gha_aics
 # gha_ar3  4 330322.4   AR3  88.74593
 # gha_ar2  3 330692.8   AR2 459.10652
 
-# MM2 model is best
+# MM3 model is best
 
 plot(gha_mm3)
 # looks good
