@@ -63,6 +63,19 @@ summary(glht(mod1_50, mcp(model="Tukey")))
 # MM3 - AR3 == 0  0.79052    0.10442   7.571   <1e-04 ***
 # MM3 - MM2 == 0 -0.09812    0.08054  -1.218    0.609  
 
+# getting effect sizes
+emmeans(mod1_50, pairwise ~model, adjust = "tukey")
+# $emmeans
+# model emmean    SE  df asymp.LCL asymp.UCL
+# AR2     1.51 0.149 Inf      1.22      1.80
+# AR3     1.72 0.143 Inf      1.44      2.00
+# MM2     2.61 0.126 Inf      2.36      2.86
+# MM3     2.51 0.128 Inf      2.26      2.76
+exp(1.51); exp(0.149)  # AR2 - 4.526731 +- 1.160673
+exp(1.72); exp(0.143)  # AR3 - 5.584528 +- 1.15373
+exp(2.61); exp(0.126)  # MM2 - 13.59905 +- 1.134282
+exp(2.51); exp(0.128)  # MM3 - 12.30493 +- 1.136553
+
 
 ##### 2B. 95% UD ######
 
@@ -89,6 +102,18 @@ summary(glht(mod1_95, mcp(model="Tukey")))
 # MM2 - AR3 == 0  0.74088    0.08077   9.172  < 0.001 ***
 # MM3 - AR3 == 0  0.85110    0.07940  10.719  < 0.001 ***
 # MM3 - MM2 == 0  0.11022    0.06319   1.744  0.29398    
+
+# getting effect sizes
+emmeans(mod1_95, pairwise ~model, adjust = "tukey")
+# model emmean     SE  df asymp.LCL asymp.UCL
+# AR2     1.93 0.1119 Inf      1.71      2.15
+# AR3     2.31 0.1022 Inf      2.11      2.51
+# MM2     3.05 0.0902 Inf      2.88      3.23
+# MM3     3.16 0.0889 Inf      2.99      3.34
+exp(1.93); exp(0.1119)  # AR2 - 6.88951 +- 1.118401
+exp(2.31); exp(0.1022)  # AR3 - 10.07442 +- 1.107605
+exp(3.05); exp(0.0902)  # MM2 - 21.11534 +- 1.094393
+exp(3.16); exp(0.0889)  # MM3 - 23.5706 +- 1.092971
 
 
 #### 3. AREA OCCUPIED - COMPARE 50% & 95% UD PREDICTIONS FOR RANGE OF POP SIZES ####
@@ -134,8 +159,8 @@ emmeans(mod2_50, pairwise ~pop, adjust = "tukey")
 # 10000   2.63 0.159 Inf      2.32      2.94
 # 1e+05   2.63 0.159 Inf      2.32      2.94
 # 1e+06   2.63 0.159 Inf      2.32      2.94
-exp(2.43) # 11
-exp(2.61) # 14
+exp(2.43); exp(0.161)  # pop 100 = 11.35888 +- 1.174685
+exp(2.61); exp(0.160)  # pop 1000 = 13.59905 +- 1.173511
 
 # prediction for 1000 pop size
 mean(pred2_50$prediction[pred2_50$pop == "1000"]) # 16.57143
@@ -184,8 +209,8 @@ emmeans(mod2_95, pairwise ~pop, adjust = "tukey")
 # 10000   3.47 0.109 Inf      3.26      3.69
 # 1e+05   3.48 0.109 Inf      3.26      3.69
 # 1e+06   3.48 0.109 Inf      3.26      3.69
-exp(3.12) # 23
-exp(3.43) # 31
+exp(3.12); exp(0.112) # pop 100 = 22.64638 +- 1.118513
+exp(3.43); exp(0.109) # pop 1000 = 30.87664 +- 1.115162
 
 # prediction for 1000 pop size
 mean(pred2_95$prediction[pred2_95$pop == "1000"]) # 34.38095
@@ -200,6 +225,7 @@ pred3$dataset <- as.factor(as.character(pred3$dataset))
 # running glmm
 mod3 <- glmer(prediction ~ iso + (1|dataset), data = pred3, family = "poisson")
 summary(mod3)
+exp(0.59388)
 # remove effect of isopleth and test significance
 mod3_2 <- update(mod3,~.- iso)
 lrtest(mod3, mod3_2)
@@ -240,6 +266,14 @@ nrow(pred3[pred3$prediction <= 30 & pred3$prediction > 20 & pred3$iso == "95",])
 nrow(pred3[pred3$prediction <= 40 & pred3$prediction > 30 & pred3$iso == "95",]) 
 # 7
 
+# effect sizes 
+emmeans(mod3, pairwise ~iso, adjust = "tukey")
+# $emmeans
+# iso emmean     SE  df asymp.LCL asymp.UCL
+# 50    2.59 0.0866 Inf      2.42      2.76
+# 95    3.18 0.0773 Inf      3.03      3.33
+exp(2.59); exp(0.0866) # 50% =  13.32977 +- 1.09046
+exp(3.18); exp(0.0733) # 50% =  24.04675 +- 1.076053
 
 
 #### 5. COMPARING PREDICTIONS FROM DIFFERENT METHODS - AREA OCCUPIED VS BIRDLIFE REPRESENTATITVENESS ####
