@@ -1,7 +1,11 @@
 library(ggplot2)
 library(plyr)
 
-#### 1. LOAD IN MINIMUM SAMPLE SIZES AND AMONG-INDIVIDUAL OVERLAP SCORES ####
+#### 1. LOAD FUNCTIONS #####
+
+source("./Codes/1_predicting_minimum_sample_sizes/functions.R")
+
+#### 2. LOAD IN MINIMUM SAMPLE SIZES AND AMONG-INDIVIDUAL OVERLAP SCORES ####
 
 # load in minimum sample sizes for gls data
 pred_gls <- read.csv("./Data_outputs/area_occupied_50_predictions.csv")
@@ -18,7 +22,7 @@ all_preds <- data.frame(prediction = c(pred_gls$prediction, pred_br$prediction),
                         device = c(rep("GLS", nrow(overlap_gls)), pred_br$device), stage = c(rep("NB", nrow(overlap_gls)), pred_br$stage))
 
 
-#### 2. EXAMINE RELATIONSHIPS BETWEEN THE TWO ####
+#### 3. EXAMINE RELATIONSHIPS BETWEEN THE TWO ####
 
 # plotting the two
 ggplot(all_preds, aes(ba, prediction)) + geom_point()
@@ -48,40 +52,37 @@ range(all_ba$ba) #  0.06 0.95
 mean(all_ba$ba)
 # 0.4130488
 
-# defining model
-pred_fun <- function(x) { 
-  y = -3.9926/log(1-x)
-  return(y)
-}
+# using function from functions.R code to predict
+ba_preds <- prediction_from_ba(all_ba$ba) 
+all_ba$prediction <- ba_preds$prediction
+all_ba$lower <- ba_preds$lower
+all_ba$upper <- ba_preds$upper
 
-# predicting
-all_ba$prediction <- pred_fun(all_ba$ba) 
-
-range(all_ba$prediction) #  1.332763 64.526448
-mean(all_ba$prediction) # 12.2497
+range(all_ba$prediction) #  1 65
+mean(all_ba$prediction) # 12.2439
 
 
 #### 4. SUMMARIZE PREDICTIONS FOR DIFFERENT TAXA ####
 
-sum_family <- ddply(all_ba,.(family), summarize, mean_pred = mean(prediction), 
+sum_family <- ddply(all_ba,.(family), summarize, mean_pred = round(mean(prediction)), 
                     N = length(family), min_pred = min(prediction), max_pred = max(prediction))
 sum_family <- sum_family[order(sum_family$mean_pred),]
 sum_family
-#               family mean_pred  N  min_pred  max_pred
-# 7  Phalacrocoracidae  3.769221  6  1.501395  7.102768
-# 5            Laridae  4.820900  8  3.225368  8.077341
-# 1            Alcidae  5.081296  8  2.797670  7.567006
-# 10           Sulidae  6.859456  5  1.332763 13.878515
-# 9       Spheniscidae  8.522902 13  2.636898 24.566984
-# 4       Hydrobatidae  9.344078  5  3.601276 18.947326
-# 6      Phaethontidae 11.527889  3 10.352576 13.878515
-# 8     Procellariidae 17.713615 20  3.803120 55.016699
-# 3         Fregatidae 18.240050  3  9.608788 31.232846
-# 2        Diomedeidae 24.295508 11  7.815974 64.526448
+#                 family mean_pred N min_pred max_pred
+# 7  Phalacrocoracidae         4  6        2        7
+# 1            Alcidae         5  8        3        8
+# 5            Laridae         5  8        3        8
+# 10           Sulidae         7  5        1       14
+# 9       Spheniscidae         8 13        3       25
+# 4       Hydrobatidae        10  5        4       19
+# 6      Phaethontidae        11  3       10       14
+# 3         Fregatidae        18  3       10       31
+# 8     Procellariidae        18 20        4       55
+# 2        Diomedeidae        24 11        8       65
 
 # proportion datasets with preditions below 10
-nrow(all_ba[all_ba$prediction<10,]) # 47
-nrow(all_ba[all_ba$prediction<10,])/nrow(all_ba)*100 # 57.31707
+nrow(all_ba[all_ba$prediction<10,]) # 43
+nrow(all_ba[all_ba$prediction<10,])/nrow(all_ba)*100 # 52.43902
 
 # proportion datasets with preditions below 20
 nrow(all_ba[all_ba$prediction<20,]) # 69
