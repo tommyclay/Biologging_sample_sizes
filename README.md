@@ -14,7 +14,7 @@ The codes are laid out in three sections:
 
 **1a_resampling_predicting_sample_sizes.r**: for example datasets, resample home-range area occupied with increasing sample size, run asymptotic models, choose the most appropriate and the predict the minimum sample size required. The resampling code can take a long time to run depending on the size of the dataset. 
 
-**1b_individual_overlap_sample_sizes.r**: for example datasets, calculate the average among-individual spatial overlap (Bhattacharyya's affinity, BA) score and use to predict a coarse value of the minimum sample size required. 
+**1b_individual_overlap_sample_sizes.r**: for example datasets, calculate the average among-individual spatial overlap (Bhattacharyya's affinity, BA) score and use to predict a coarse value of the mum sample size required. 
 
 
 ### 2) Reproducing analyses from the paper
@@ -23,7 +23,7 @@ The codes are laid out in three sections:
 
 **2b_resampling_birdlife_predicting_sample_sizes.r**: loads in GLS datasets and calculates kernel UDs and then runs code from the track2KBA R package to estimate representativeness of datasets based on the inclusion approach. 
 
-**2c_glmms_comparing_predicted_sample_sizes.r**: loads in minimium sample sizes based on area occupied and inclusion approaches (above) and runs GLMMs too compare predictions according to UD level (50% versus 95%), resampling approach, asymptotic model used, and the population size models are projected to.
+**2c_glmms_comparing_predicted_sample_sizes.r**: loads in minimum sample sizes based on area occupied and inclusion approaches (above) and runs GLMMs too compare predictions according to UD level (50% versus 95%), resampling approach, asymptotic model used, and the population size models are projected to.
 
 **2d_testing_og_sample_size_on_predictions.r**: loads in GLS datasets and randomly subsets at intervals of n = 5 and then resamples the home-range area occupied. Asymptotic models are run on resampled outputs to predict minimum sample sizes required, and a GLMM run to examine the effect of original sample size on predictions. 
 
