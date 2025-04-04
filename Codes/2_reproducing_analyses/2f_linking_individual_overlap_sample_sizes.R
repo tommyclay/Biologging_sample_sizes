@@ -49,8 +49,11 @@ mean(all_ba$ba)
 # 0.4130488
 
 # defining model
-pred_fun <- function(x) { y = -3.9926/log(1-x)
-      return(y)}
+pred_fun <- function(x) { 
+  y = -3.9926/log(1-x)
+  return(y)
+}
+
 # predicting
 all_ba$prediction <- pred_fun(all_ba$ba) 
 

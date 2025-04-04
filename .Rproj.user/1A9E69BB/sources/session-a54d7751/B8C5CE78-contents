@@ -44,10 +44,12 @@ wcp_ba_avg
 
 # GHA
 prediction_from_ba(gha_ba_avg) 
-# 16.5299
+#        ba prediction lower upper
+# 0.2145811         17    15    18
 # 17 individuals is slightly lower than that predicted using area occupied method = 19 (from 1a)
 
 # WCP
 prediction_from_ba(wcp_ba_avg) 
-# 15.56224
+#       ba prediction lower upper
+# 0.2262891         16    14    17
 # 16 individuals is slightly lower than that predicted using area occupied method = 17 (from 1a)

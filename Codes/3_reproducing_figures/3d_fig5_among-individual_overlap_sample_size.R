@@ -19,14 +19,31 @@ all_preds <- data.frame(prediction = c(pred_gls$prediction, pred_br$prediction),
                         device = c(rep("GLS", nrow(overlap_gls)), pred_br$device), stage = c(rep("NB", nrow(overlap_gls)), pred_br$stage))
 
 # setting up function and predicting onto dummy dataset
-pred_fun <- function(x) { y = -3.9926/log(1-x)
-return(y)}
-fake_df <- data.frame(x = seq(0.05, 1, 0.005))
-fake_df$y <- pred_fun(fake_df$x)
+# editing function from function codes to not round up numbers to predict to - see functions.R code
+prediction_from_ba_woround <- function(ba) {
+  x <- ba$ba
+  # Compute predictions
+  y <- -3.9926/log(1-x)
+  # Compute the gradient manually: derivative w.r.t k
+  grad_matrix <- matrix(1 / log(1 - x), ncol = 1)  # Ensure it's a matrix
+  # Compute standard error of predictions from vcov of model
+  se_fit <- sqrt(grad_matrix^2 * 0.05120739)
+  # Compute 95% confidence intervals
+  alpha <- 0.05
+  z_score <- qnorm(1 - alpha / 2)  # 1.96 for 95% CI
+  upper <- y + z_score * se_fit
+  lower <- y - z_score * se_fit
+  # Output dataframe as whole numbers
+  out_df <- data.frame(ba = x, prediction = y, lower = lower, upper = upper)
+  return(out_df)
+}
+fake_df <- data.frame(ba = seq(0.05, 1, 0.005))
+pred_df <- prediction_from_ba_woround(fake_df)
 
 # load in oppel 2018 values
 oppel <- read.csv("./Data_inputs/oppel_et_al_2018_ba_scores.csv")
-oppel$prediction <- pred_fun(oppel$ba) 
+oppel_pred <- prediction_from_ba(oppel) 
+oppel$prediction <- oppel_pred$prediction
 
 
 #### 2. PLOTTING #####
@@ -38,9 +55,10 @@ all_preds$Species <- all_preds$species
 all_preds$Device <- all_preds$device
 
 p1 <- ggplot() + geom_point(data = all_preds, aes(x = ba, y = prediction, colour = Species, shape = Device)) + 
-  geom_line(data = fake_df, aes(x = x, y = y)) + theme_bw() + xlab("BA overlap") + ylab("Minimum sample size") +
+  geom_ribbon(data = pred_df, aes(x = ba, ymin = lower, ymax = upper), alpha = 0.3, fill = "grey50") +
+  geom_line(data = pred_df, aes(x = ba, y = prediction)) + theme_bw() + xlab("BA overlap") + ylab("Minimum sample size") +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1))+
-  scale_y_continuous(limits = c(1, 78), breaks = seq(0, 80, 10))+
+  scale_y_continuous(limits = c(1, 87), breaks = seq(0, 80, 10))+
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
         axis.title = element_text(size = 13), axis.text = element_text(size = 11),
         legend.title = element_text(size = 11), legend.text = element_text(size = 9),

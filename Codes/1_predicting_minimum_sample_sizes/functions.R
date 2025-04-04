@@ -243,12 +243,30 @@ pairwise_BA_overlap <- function(x, h, cellsize, iso_level, proj_in, proj_out) {
 
 #### FUNCTION TO PREDICT MINIMUM SAMPLE SIZES BASED ON AVERAGE BA VALUES ####
 
-prediction_from_ba <- function(x) { 
-  y = -3.9926/log(1-x)
-  return(y)
+prediction_from_ba <- function(ba) {
+  # Check if vector or dataframe
+  if (is.data.frame(ba)) {
+    x <- ba$ba
+  } else if (is.vector(ba)) {
+    x <- ba 
+  }
+  # Compute predictions
+  y <- -3.9926/log(1-x)
+  # Compute the gradient manually: derivative w.r.t k
+  grad_matrix <- matrix(1 / log(1 - x), ncol = 1)  # Ensure it's a matrix
+  # Compute standard error of predictions from vcov of model
+  se_fit <- sqrt(grad_matrix^2 * 0.05120739)
+  # Compute 95% confidence intervals
+  alpha <- 0.05
+  z_score <- qnorm(1 - alpha / 2)  # 1.96 for 95% CI
+  upper <- y + z_score * se_fit
+  lower <- y - z_score * se_fit
+  # Output dataframe as whole numbers
+  out_df <- data.frame(ba = x, prediction = round(y), lower = round(lower), upper = round(upper))
+  return(out_df)
 }
 
-# x = vector with average BA values (between 0 and 1) to predict from 
+# either a vector or dataframe with column ba with average BA values (between 0 and 1) to predict from 
 
 
 #### FUNCTION TO RESAMPLE OVERLAP WITH THREATS (E.G. FISHERIES) WITH SAMPLE SIZE ####
