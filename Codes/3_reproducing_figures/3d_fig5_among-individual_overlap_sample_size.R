@@ -42,7 +42,7 @@ pred_df <- prediction_from_ba_woround(fake_df)
 
 # load in oppel 2018 values
 oppel <- read.csv("./Data_inputs/oppel_et_al_2018_ba_scores.csv")
-oppel_pred <- prediction_from_ba(oppel) 
+oppel_pred <- prediction_from_ba_woround(oppel) 
 oppel$prediction <- oppel_pred$prediction
 
 
