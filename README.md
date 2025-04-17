@@ -1,4 +1,4 @@
-# Modest sample sizes are often sufficient for biologging to inform conservation
+# Modest sample sizes are often sufficient for biologging to inform marine conservation
 
 Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Navarro, Jacob González-Solís, Andrea Manica
 
