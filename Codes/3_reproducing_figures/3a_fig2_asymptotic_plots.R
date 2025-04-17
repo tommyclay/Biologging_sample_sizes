@@ -38,7 +38,7 @@ ap10_p <- ggplot() + geom_line(data = ap10, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 1.45), breaks = seq(0, 1.25, 0.25), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(ap10$sample), 1)) +
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "AP10"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "AP10"], linetype="dotted",  colour = "red") 
 ap10_p
 
 
@@ -63,7 +63,7 @@ ap11_p <- ggplot() + geom_line(data = ap11, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 1.45), breaks = seq(0, 1.25, 0.25), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(ap11$sample), 1)) 
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "AP11"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "AP11"], linetype="dotted",  colour = "red")
 ap11_p
 
 ##### 1C. AP BOTH #####
@@ -87,7 +87,7 @@ apboth_p <- ggplot() + geom_line(data = apboth, aes(x = sample, y = tot_area, gr
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 1.45), breaks = seq(0, 1.25, 0.25), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(apboth$sample), 2)) +
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "APBOTH"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "APBOTH"], linetype="dotted",  colour = "red")
 apboth_p
 
 
@@ -112,7 +112,7 @@ bba02_p <- ggplot() + geom_line(data = bba02, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 3.6), breaks = seq(0, 3.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bba02$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BBA02"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BBA02"], linetype="dotted",  colour = "red")
 bba02_p
 
 
@@ -137,7 +137,7 @@ bba03_p <- ggplot() + geom_line(data = bba03, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 3.6), breaks = seq(0, 3.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bba03$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BBA03"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BBA03"], linetype="dotted",  colour = "red")
 bba03_p
 
 
@@ -162,7 +162,7 @@ bp11_p <- ggplot() + geom_line(data = bp11, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 4.7), breaks = seq(0, 4, 1), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bp11$sample), 1))  + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BP11"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BP11"], linetype="dotted",  colour = "red")
 bp11_p
 
 
@@ -187,7 +187,7 @@ bs02_p <- ggplot() + geom_line(data = bs02, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 3.85), breaks = seq(0, 3.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bs02$sample), 1)) 
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BS02"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BS02"], linetype="dotted",  colour = "red")
 bs02_p
 
 
@@ -213,7 +213,7 @@ bs12_p <- ggplot() + geom_line(data = bs12, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 3.85), breaks = seq(0, 3.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bs12$sample), 2)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BS12"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BS12"], linetype="dotted",  colour = "red")
 bs12_p
 
 
@@ -239,7 +239,7 @@ bsboth_p <- ggplot() + geom_line(data = bsboth, aes(x = sample, y = tot_area, gr
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 3.85), breaks = seq(0, 3.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(bsboth$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BSBOTH"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "BSBOTH"], linetype="dotted",  colour = "red")
 bsboth_p
 
 
@@ -265,7 +265,7 @@ gha99_p <- ggplot() + geom_line(data = gha99, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 7.6), breaks = seq(0, 7, 1), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(gha99$sample), 4))  +
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "GHA99"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "GHA99"], linetype="dotted",  colour = "red")
 gha99_p
 
 
@@ -291,7 +291,7 @@ lma04_p <- ggplot() + geom_line(data = lma04, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 4.85), breaks = seq(0, 4, 1), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(lma04$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "LMA04"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "LMA04"], linetype="dotted",  colour = "red")
 lma04_p
 
 
@@ -317,7 +317,7 @@ lma05_p <- ggplot() + geom_line(data = lma05, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 4.85), breaks = seq(0, 4, 1), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(lma05$sample), 2)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "LMA05"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "LMA05"], linetype="dotted",  colour = "red")
 lma05_p
 
 
@@ -343,7 +343,7 @@ ngp00_p <- ggplot() + geom_line(data = ngp00, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 2.3), breaks = seq(0, 2.5, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(ngp00$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "NGP00"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "NGP00"], linetype="dotted",  colour = "red")
 ngp00_p
 
 
@@ -369,7 +369,7 @@ sgp00_p <- ggplot() + geom_line(data = sgp00, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 2.8), breaks = seq(0, 3, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(sgp00$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "SGP00"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "SGP00"], linetype="dotted",  colour = "red")
 sgp00_p
 
 
@@ -394,7 +394,7 @@ wa04_p <- ggplot() + geom_line(data = wa04, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 9.9), breaks = seq(0, 8, 2), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wa04$sample), 2)) 
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA04"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA04"], linetype="dotted",  colour = "red")
 wa04_p
 
 
@@ -419,7 +419,7 @@ wa08_p <- ggplot() + geom_line(data = wa08, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 9.9), breaks = seq(0, 8, 2), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wa08$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA08"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA08"], linetype="dotted",  colour = "red")
 wa08_p
 
 
@@ -444,7 +444,7 @@ wa09_p <- ggplot() + geom_line(data = wa09, aes(x = sample, y = tot_area, group 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 9.9), breaks = seq(0, 8, 2), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wa09$sample), 4)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA09"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WA09"], linetype="dotted",  colour = "red")
 wa09_p
 
 ##### 1Q. WA ALL #####
@@ -468,7 +468,7 @@ waall_p <- ggplot() + geom_line(data = waall, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 9.9), breaks = seq(0, 8, 2), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(waall$sample), 10)) + 
-  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WAALL"], linetype="dotted")
+  geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WAALL"], linetype="dotted",  colour = "red")
 waall_p
 
 
@@ -493,7 +493,7 @@ wcp03_p <- ggplot() + geom_line(data = wcp03, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 2.35), breaks = seq(0, 2, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wcp03$sample), 1)) 
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCP03"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCP03"], linetype="dotted",  colour = "red")
 wcp03_p
 
 
@@ -518,7 +518,7 @@ wcp13_p <- ggplot() + geom_line(data = wcp13, aes(x = sample, y = tot_area, grou
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 2.35), breaks = seq(0, 2, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wcp13$sample), 1)) 
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCP13"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCP13"], linetype="dotted",  colour = "red")
 wcp13_p
 
 
@@ -543,7 +543,7 @@ wcpboth_p <- ggplot() + geom_line(data = wcpboth, aes(x = sample, y = tot_area, 
   ylab(expression("HR area (10"^6~km^2~")"))+
   scale_y_continuous(limits = c(0, 2.35), breaks = seq(0, 2, 0.5), expand = c(0, 0))+
   scale_x_continuous(breaks = seq(0, max(wcpboth$sample), 2))  
-  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCPBOTH"], linetype="dotted")
+  #geom_vline(xintercept=min_sample$prediction[min_sample$dataset == "WCPBOTH"], linetype="dotted",  colour = "red")
 wcpboth_p
 
 
