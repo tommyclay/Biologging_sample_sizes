@@ -1,10 +1,10 @@
-# Modest sample sizes are often sufficient for biologging to inform marine conservation
+# From individuals to populations: estimating minimum sample sizes for seabird biologging to inform conservation
 
 Thomas A. Clay, Richard A. Phillips Ana P.B. Carneiro, Janet R. D. Silk, Joan Navarro, Jacob González-Solís, Andrea Manica
 
 ## Overview
 
-The following repository contains codes and datasets to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Conservation Biology. 
+The following repository contains codes and datasets to 1) predict minimum sample sizes required based on spatial biologging data, and to reproduce 2) analyses and 3) figures from the paper, submitted to Movement Ecology. 
 
 ## Codes
 
@@ -36,12 +36,12 @@ The codes are laid out in three sections:
 
 ### 3) Reproducing figures from the paper
 
-**3a_fig2_asymptotic_plots.r**: loads in resampled datasets and models to predict the asymptotic relationships between sample size and home-range area (Fig. 2).
+**3a_fig2_asymptotic_plots_non-breeding.r**: loads in resampled datasets and models to predict the asymptotic relationships between sample size and home-range area (Fig. 2) for geolocator datasets during the non-breeding season.
 
-**3b_fig3_sensitivity_analysis_og_sample_size.r**: loads in predictions from the sensitivity analysis (2d, above) to plot the relationship between original sample sizes and minimum sample sizes required 
-(Fig. 3). 
+**3b_fig3_asymptotic_plots_nbreeding.r**: same as above but for GPS and PTT datasets during the breeding season (Fig. 3).
 
-**3c_fig4_individual_overlap_maps.r**: loads in GLS datasets, creates kernel UDs for each individual and the whole population, and plots maps for each species and year combination (Fig. 4).
+**3c_fig4_sensitivity_analysis_og_sample_size.r**: loads in predictions from the sensitivity analysis (2d, above) to plot the relationship between original sample sizes and minimum sample sizes required 
+(Fig. 4). 
 
 **3d_fig5_among-individual_overlap_sample_size.r**: loads in minimum sample sizes and among-individual overlap scores from South Georgia datasets and plots the relationship (Fig. 5a). Also loads in Oppel et al. (2018) values and plots BA overlap scores and minimum sample sizes at the Family level (Fig. 5b, c). 
 
