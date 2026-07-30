@@ -1,0 +1,26 @@
+{
+    "id": "B4633950",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/2_reproducing_analyses/2c_glmms_comparing_predicted_sample_sizes_Jun26.R",
+    "project_path": "Codes/2_reproducing_analyses/2c_glmms_comparing_predicted_sample_sizes_Jun26.R",
+    "type": "r_source",
+    "hash": "679655005",
+    "contents": "",
+    "dirty": false,
+    "created": 1781127517542.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "384,0",
+        "scrollLine": "369"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1781203371,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1781203371394,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,775 @@
+library(adehabitatHR)
+library(sf)
+library(raster)
+library(future.apply)
+library(parallel)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(pbapply)
+library(compiler)
+library(drc)
+
+#### 1. LOAD FUNCTIONS #####
+
+#source("./Codes/1_predicting_minimum_sample_sizes/functions.R")
+#source("C:/Users/44753/Documents/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/functions.R")
+source("C:/Users/44753/Documents/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/functions_feb26.R")
+
+#### 2. LOADING IN DATASETS ####
+
+# in_direx <- "./Data_inputs/gls_data/"
+# 
+# # grey-headed albatrosses tracked in 1999-2000
+# gha <- read.csv(paste0(in_direx, "gha99.csv"))
+# 
+# # white-chinned petrels tracked in 2003
+# wcp <- read.csv(paste0(in_direx, "wcp03.csv"))
+
+all.tracks <- read.csv("C:/Users/44753/Documents/Life-stages fisheries/Data_inputs/PTT_GPS_filtered_4sp_breed.csv")
+all.tracks$TRACKID <- as.factor(as.character(all.tracks$TRACKID))
+
+out.direx <- "./Boots/2026 resampled outputs/"
+
+
+
+#### 3. RESAMPLING AND PASTING OUT DATASETS ####
+
+# set projections
+# for gha, lambert azimuthal equal area projection centred around south pole
+# proj_gha <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
+# # for gha, lambert azimuthal equal area projection centred around median lon and lat
+# proj_wcp <- paste0("+proj=laea +lat_0=", median(wcp$latitude), " +lon_0=", median(wcp$longitude), " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+# WGS84 projection
+proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
+
+colony <- data.frame(Longitude = -38.05, Latitude = -90)
+proj_col <- paste0("+proj=laea +lat_0=", colony$Latitude, " +lon_0=", colony$Longitude, " +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+
+# resampling for 50% UD - for 500 iterations as an example (recommend using 1,000+ for final run)
+# 50 km grid cell size and 186 km smoothing factor for GLS data (change based on type of biologging data)
+
+set.seed(123) # for reproducibility 
+
+# # GHA
+# gha_res <- resampling_UD_area(x = gha, n_iter = 500, 
+#                              iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
+#                              proj_out = proj_gha, n_core = 6)
+# ggplot(gha_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+# 
+# 
+# # WCP 
+# wcp_res <- resampling_UD_area(x = wcp, n_iter = 500, 
+#                                  iso_level = 50, cellsize = 50000, h = 186000, proj_in = proj_dec,
+#                                  proj_out = proj_wcp, n_core = 6)
+# ggplot(wcp_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+
+
+#column names should be 
+#species	
+#year	
+#id	
+#longitude	
+#latitude
+
+
+######## WA - INC - GPS - DONE ##########
+
+wa <- subset(all.tracks, SPECIES == "WALB",)
+wa_inc <- subset(wa, STAGE == "INC",)
+wa_inc <- subset(wa_inc, DEVICE == "GPS",)
+wa_inc$RING <- as.factor(as.character(wa_inc$RING))
+wa_inc$id <- as.factor(as.character(wa_inc$RING))
+wa_inc$longitude <- wa_inc$LON
+wa_inc$latitude <- wa_inc$LAT
+
+wa_inc_res <- resampling_UD_area(x = wa_inc, n_iter = 1000, 
+                          iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                          proj_out = proj_col, n_core = 6)
+ggplot(wa_inc_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+wa_inc_res$tot_area <- wa_inc_res$tot_area/1000000
+
+# paste out
+write.csv(wa_inc_res, paste0(out.direx, "GPS_WAINC", "_1k_95.csv"))
+
+
+######## GHA - INC - PTT - DONE ##########
+
+
+gha <- subset(all.tracks, SPECIES == "GHA",)
+gha_inc <- subset(gha, STAGE == "INC",)
+gha_inc <- subset(gha_inc, DEVICE == "PTT",)
+gha_inc$RING <- as.factor(as.character(gha_inc$RING))
+gha_inc$id <- as.factor(as.character(gha_inc$RING))
+gha_inc$longitude <- gha_inc$LON
+gha_inc$latitude <- gha_inc$LAT
+
+gha_inc_res <- resampling_UD_area(x = gha_inc, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(gha_inc_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+gha_inc_res$tot_area <- gha_inc_res$tot_area/1000000
+# paste out
+write.csv(gha_inc_res, paste0(out.direx, "PTT_GHAINC", "_1k_95.csv"))
+
+
+
+######## BBA - INC - GPS - DONE ##########
+
+
+bba <- subset(all.tracks, SPECIES == "BBA",)
+bba_inc <- subset(bba, STAGE == "INC",)
+bba_inc <- subset(bba_inc, DEVICE == "GPS",)
+bba_inc$RING <- as.factor(as.character(bba_inc$RING))
+bba_inc$id <- as.factor(as.character(bba_inc$RING))
+bba_inc$longitude <- bba_inc$LON
+bba_inc$latitude <- bba_inc$LAT
+
+bba_inc_res <- resampling_UD_area(x = bba_inc, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(bba_inc_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+bba_inc_res$tot_area <- bba_inc_res$tot_area/1000000
+# paste out
+write.csv(bba_inc_res, paste0(out.direx, "GPS_BBAINC", "_1k_95.csv"))
+
+
+
+######## WA - BROOD - GPS - DONE ##########
+
+
+wa_br <- subset(wa, STAGE == "BR",)
+wa_br_gps <- subset(wa_br, DEVICE == "GPS",)
+wa_br_gps$RING <- as.factor(as.character(wa_br_gps$RING))
+wa_br_gps$id <- as.factor(as.character(wa_br_gps$RING))
+wa_br_gps$longitude <- wa_br_gps$LON
+wa_br_gps$latitude <- wa_br_gps$LAT
+
+wa_br_gps_res <- resampling_UD_area(x = wa_br_gps, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(wa_br_gps_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+wa_br_gps_res$tot_area <- wa_br_gps_res$tot_area/1000000
+# paste out
+write.csv(wa_br_gps_res, paste0(out.direx, "GPS_WABR", "_1k_95.csv"))
+
+
+
+######## WA - BROOD - PTT - DONE ##########
+
+
+wabr <- subset(wa, STAGE == "BR",)
+wa_br_ptt <- subset(wa_br, DEVICE == "PTT",)
+wa_br_ptt$RING <- as.factor(as.character(wa_br_ptt$RING))
+wa_br_ptt$id <- as.factor(as.character(wa_br_ptt$RING))
+wa_br_ptt$longitude <- wa_br_ptt$LON
+wa_br_ptt$latitude <- wa_br_ptt$LAT
+
+wa_br_ptt_res <- resampling_UD_area(x = wa_br_ptt, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(wa_br_ptt_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+wa_br_ptt_res$tot_area <- wa_br_ptt_res$tot_area/1000000
+# paste out
+write.csv(wa_br_ptt_res, paste0(out.direx, "PTT_WABR", "_1k_95.csv"))
+
+
+
+######## GHA - BROOD - GPS - DONE ##########
+
+gha_br <- subset(gha, STAGE == "BR",)
+gha_br <- subset(gha_br, DEVICE == "GPS",)
+gha_br$RING <- as.factor(as.character(gha_br$RING))
+gha_br$id <- as.factor(as.character(gha_br$RING))
+gha_br$longitude <- gha_br$LON
+gha_br$latitude <- gha_br$LAT
+
+gha_br_res <- resampling_UD_area(x = gha_br, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(gha_br_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+gha_br_res$tot_area <- gha_br_res$tot_area/1000000
+# paste out
+write.csv(gha_br_res, paste0(out.direx, "GPS_GHABR", "_1k_95.csv"))
+
+
+
+
+######## BBA - BROOD - GPS - DONE ##########
+
+
+bba_br <- subset(bba, STAGE == "BR",)
+bba_br <- subset(bba_br, DEVICE == "GPS",)
+bba_br$RING <- as.factor(as.character(bba_br$RING))
+bba_br$id <- as.factor(as.character(bba_br$RING))
+bba_br$longitude <- bba_br$LON
+bba_br$latitude <- bba_br$LAT
+
+bba_br_res <- resampling_UD_area(x = bba_br, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(bba_br_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+bba_br_res$tot_area <- bba_br_res$tot_area/1000000
+# paste out
+write.csv(bba_br_res, paste0(out.direx, "GPS_BBABR", "_1k_95.csv"))
+
+
+
+######## WA - POST-BROOD - GPS - DONE ##########
+
+
+wa_pb <- subset(wa, STAGE == "PB",)
+wa_pb_gps <- subset(wa_pb, DEVICE == "GPS",)
+wa_pb_gps$RING <- as.factor(as.character(wa_pb_gps$RING))
+wa_pb_gps$id <- as.factor(as.character(wa_pb_gps$RING))
+wa_pb_gps$longitude <- wa_pb_gps$LON
+wa_pb_gps$latitude <- wa_pb_gps$LAT
+
+wa_pb_gps_res <- resampling_UD_area(x = wa_pb_gps, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(wa_pb_gps_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+wa_pb_gps_res$tot_area <- wa_pb_gps_res$tot_area/1000000
+# paste out
+write.csv(wa_pb_gps_res, paste0(out.direx, "GPS_WAPB", "_1k_95.csv"))
+
+
+
+
+######## WA - POST-BROOD - PTT - DONE ##########
+
+
+wa_pb <- subset(wa, STAGE == "PB",)
+wa_pb_ptt <- subset(wa_pb, DEVICE == "PTT",)
+wa_pb_ptt$RING <- as.factor(as.character(wa_pb_ptt$RING))
+wa_pb_ptt$id <- as.factor(as.character(wa_pb_ptt$RING))
+wa_pb_ptt$longitude <- wa_pb_ptt$LON
+wa_pb_ptt$latitude <- wa_pb_ptt$LAT
+
+wa_pb_ptt_res <- resampling_UD_area(x = wa_pb_ptt, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(wa_pb_ptt_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+wa_pb_ptt_res$tot_area <- wa_pb_ptt_res$tot_area/1000000
+# paste out
+write.csv(wa_pb_ptt_res, paste0(out.direx, "PTT_WAPB", "_1k_95.csv"))
+
+
+
+######## GHA - POSTBROOD - PTT- DONE ##########
+
+
+gha_pb <- subset(gha, STAGE == "PB",)
+gha_pb <- subset(gha_pb, DEVICE == "PTT",)
+gha_pb$RING <- as.factor(as.character(gha_pb$RING))
+gha_pb$id <- as.factor(as.character(gha_pb$RING))
+gha_pb$longitude <- gha_pb$LON
+gha_pb$latitude <- gha_pb$LAT
+
+gha_pb_res <- resampling_UD_area(x = gha_pb, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(gha_pb_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+gha_pb_res$tot_area <- gha_pb_res$tot_area/1000000
+# paste out
+write.csv(gha_pb_res, paste0(out.direx, "PTT_GHAPB", "_1k_95.csv"))
+
+
+######## BBA - POST-BROOD - PTT - DONE ##########
+
+
+bba_pb <- subset(bba, STAGE == "PB",)
+bba_pb <- subset(bba_pb, DEVICE == "PTT",)
+bba_pb$RING <- as.factor(as.character(bba_pb$RING))
+bba_pb$id <- as.factor(as.character(bba_pb$RING))
+bba_pb$longitude <- bba_pb$LON
+bba_pb$latitude <- bba_pb$LAT
+
+bba_pb_res <- resampling_UD_area(x = bba_pb, n_iter = 1000, 
+                                 iso_level = 95, cellsize = 10000, h = 50000, proj_in = proj_dec,
+                                 proj_out = proj_col, n_core = 6)
+ggplot(bba_pb_res, aes(sample, tot_area)) + geom_line(aes(group = factor(iteration)))
+
+# plotting
+bba_pb_res$tot_area <- bba_pb_res$tot_area/1000000
+# paste out
+write.csv(bba_pb_res, paste0(out.direx, "PTT_BBAPB", "_1k_95.csv"))
+
+
+
+
+#### 4. RUN ASYMPTOTIC MODELS AND COMPARE AIC ####
+
+# # GHA 
+# gha_res$x <- gha_res$sample
+# gha_res$area <- gha_res$tot_area
+# gha_mm2 <- run_asymptotic_model(dat = gha_res, type = "MM2")
+# gha_mm3 <- run_asymptotic_model(dat = gha_res, type = "MM3")
+# gha_ar2 <- run_asymptotic_model(dat = gha_res, type = "AR2")
+# gha_ar3 <- run_asymptotic_model(dat = gha_res, type = "AR3")
+# # compare AICs
+# gha_aics <- AIC(gha_mm2, gha_mm3, gha_ar2, gha_ar3)
+# gha_aics$model <- c("MM2", "MM3", "AR2", "AR3")
+# gha_aics <- gha_aics[order(gha_aics$AIC),]
+# gha_aics$dAIC <- gha_aics$AIC-gha_aics$AIC[1]
+# gha_aics
+# #         df      AIC model      dAIC
+# # gha_mm3  4 330233.7   MM3   0.00000
+# # gha_mm2  3 330246.7   MM2  13.05636
+# # gha_ar3  4 330322.4   AR3  88.74593
+# # gha_ar2  3 330692.8   AR2 459.10652
+# 
+# # MM3 model is best
+# 
+# plot(gha_mm3)
+# # looks good
+# 
+# # WCP 
+# wcp_res$x <- wcp_res$sample
+# wcp_res$area <- wcp_res$tot_area
+# wcp_mm2 <- run_asymptotic_model(dat = wcp_res, type = "MM2")
+# wcp_mm3 <- run_asymptotic_model(dat = wcp_res, type = "MM3")
+# wcp_ar2 <- run_asymptotic_model(dat = wcp_res, type = "AR2")
+# wcp_ar3 <- run_asymptotic_model(dat = wcp_res, type = "AR3")
+# # compare AICs
+# wcp_aics <- AIC(wcp_mm2, wcp_mm3, wcp_ar2, wcp_ar3)
+# wcp_aics$model <- c("MM2", "MM3", "AR2", "AR3")
+# wcp_aics <- wcp_aics[order(wcp_aics$AIC),]
+# wcp_aics$dAIC <- wcp_aics$AIC-wcp_aics$AIC[1]
+# wcp_aics
+# #         df    AIC   model    dAIC
+# # wcp_mm3  4 138061.3   MM3  0.000000
+# # wcp_ar3  4 138066.3   AR3  5.025178
+# # wcp_ar2  3 138089.2   AR2 27.899487
+# # wcp_mm2  3 138098.0   MM2 36.695000
+# 
+# # MM3 model best
+# 
+# plot(wcp_mm3)
+# # looks good
+
+
+
+######## WA - INC - GPS ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_WAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df      AIC model     dAIC
+# mm3  4 52400.11   MM3    0.000
+# mm2  3 53464.60   MM2 1064.495
+# ar3  4 53639.27   AR3 1239.163
+# ar2  3 58885.35   AR2 6485.244
+
+
+
+######## GHA - INC - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_GHAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df      AIC model      dAIC
+# mm3  4 29423.72   MM3   0.00000
+# ar3  4 29520.00   AR3  96.28046
+# mm2  3 29558.01   MM2 134.28547
+# ar2  3 29998.64   AR2 574.92013
+
+
+
+######## BBA - INC - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_BBAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df      AIC model       dAIC
+# mm3  4 14197.87   MM3    0.00000
+# mm2  3 14294.13   MM2   96.26556
+# ar3  4 14678.27   AR3  480.40599
+# ar2  3 16338.39   AR2 2140.52666
+
+
+######## WA - BROOD - GPS  ##########
+
+
+dat <- read.csv(paste0(out.direx, "GPS_WABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model      dAIC
+# mm3  4 -70964.12   MM3    0.0000
+# mm2  3 -70755.67   MM2  208.4499
+# ar3  4 -70593.08   AR3  371.0389
+# ar2  3 -68746.26   AR2 2217.8614
+
+
+######## WA - BROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_WABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model      dAIC
+# mm3  4 -70964.12   MM3    0.0000
+# mm2  3 -70755.67   MM2  208.4499
+# ar3  4 -70593.08   AR3  371.0389
+# ar2  3 -68746.26   AR2 2217.8614
+
+
+######## GHA - BROOD - GPS  ##########
+
+
+dat <- read.csv(paste0(out.direx, "GPS_GHABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model      dAIC
+# mm3  4 -85783.71   MM3     0.000
+# mm2  3 -84238.67   MM2  1545.035
+# ar3  4 -83594.67   AR3  2189.035
+# ar2  3 -74272.79   AR2 11510.913
+
+
+######## BBA - BROOD - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_BBABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model      dAIC
+# mm3  4 -93322.20   MM3    0.0000
+# ar3  4 -92858.11   AR3  464.0923
+# mm2  3 -91552.03   MM2 1770.1661
+# ar2  3 -87408.12   AR2 5914.0793
+
+
+
+######## WA - POST-BROOD - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_WAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df      AIC model      dAIC
+# mm3  4 36884.97   MM3    0.0000
+# mm2  3 37645.76   MM2  760.7907
+# ar3  4 37775.47   AR3  890.4997
+# ar2  3 42140.29   AR2 5255.3281
+
+
+######## WA - POST-BROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_WAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model       dAIC
+# mm3  4  95235.18   MM3     0.0000
+# mm2  3  95627.53   MM2   392.3493
+# ar3  4  99855.57   AR3  4620.3843
+# ar2  3 109552.50   AR2 14317.3166
+
+
+######## GHA - POSTBROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_GHAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df       AIC model     dAIC
+# mm3  4 -39187.56   MM3    0.000
+# ar3  4 -37735.37   AR3 1452.190
+# mm2  3 -37503.18   MM2 1684.387
+# ar2  3 -29281.48   AR2 9906.084
+
+
+
+######## BBA - POST-BROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_BBAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mm2 <- run_asymptotic_model(dat = dat, type = "MM2")
+mm3 <- run_asymptotic_model(dat = dat, type = "MM3")
+ar2 <- run_asymptotic_model(dat = dat, type = "AR2")
+ar3 <- run_asymptotic_model(dat = dat, type = "AR3")
+# compare AICs
+aics <- AIC(mm2, mm3, ar2, ar3)
+aics$model <- c("MM2", "MM3", "AR2", "AR3")
+aics <- aics[order(aics$AIC),]
+aics$dAIC <- aics$AIC-aics$AIC[1]
+aics
+# df         AIC model      dAIC
+# mm3  4 -1930.18927   MM3    0.0000
+# ar3  4 -1823.06984   AR3  107.1194
+# mm2  3 -1444.59309   MM2  485.5962
+# ar2  3   -20.44574   AR2 1909.7435
+
+
+#### 5. PREDICT MINIMUM SAMPLE SIZES FOR A GIVEN POPULATION SIZE ####
+
+# just predicting to a population size of 100 for now
+
+# # GHA 
+# gha_pred <- sample_prediction(model = gha_mm3, pop_size = 100, percent_cover = 95)
+# gha_pred
+# #    prediction lower upper pop_size
+# #          19    18    20      100
+# 
+# # WCP
+# wcp_pred <- sample_prediction(model = wcp_mm3, pop_size = 100, percent_cover = 95)
+# wcp_pred
+# #    prediction lower upper pop_size
+# #          17    16    18      100
+
+
+
+######## WA - INC - GPS ##########
+
+
+dat <- read.csv(paste0(out.direx, "GPS_WAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+# prediction lower upper pop_size
+# 1         66    66    67      100
+
+
+
+######## GHA - INC - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_GHAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#    prediction lower upper pop_size
+# 1        65    64    66      100
+
+
+######## BBA - INC - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_BBAINC", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+# prediction lower upper pop_size
+# 1         58    58    59      100
+
+
+######## WA - BROOD - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_WABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#    prediction lower upper pop_size
+# 1         46    46    47      100
+
+
+######## WA - BROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_WABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+# prediction lower upper pop_size
+# 1         50    49    51      100
+
+
+######## GHA - BROOD - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_GHABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#    prediction lower upper pop_size
+# 1        58    57    58      100
+
+
+
+######## BBA - BROOD - GPS  ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_BBABR", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+# prediction lower upper pop_size
+# 1         66    66    67      100
+
+
+######## WA - POST-BROOD - GPS ##########
+
+dat <- read.csv(paste0(out.direx, "GPS_WAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#    prediction lower upper pop_size
+# 1          65    65    66      100
+
+
+
+######## WA - POST-BROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_WAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+# prediction lower upper pop_size
+# 1        60    60    60      100
+
+
+######## GHA - POSTBROOD - PTT  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_GHAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#    prediction lower upper pop_size
+# 1         47    46    47      100
+
+
+
+######## BBA - POST-BROOD  ##########
+
+dat <- read.csv(paste0(out.direx, "PTT_BBAPB", "_1k_95.csv"))
+dat$x <- dat$sample
+dat$area <- dat$tot_area
+mod <- run_asymptotic_model(dat = dat, type = "MM3")
+pred <- sample_prediction(model = mod, pop_size = 100, percent_cover = 95)
+pred
+#   prediction lower upper pop_size
+# 1        46    45    47      100

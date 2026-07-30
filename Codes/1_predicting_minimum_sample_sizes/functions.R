@@ -18,6 +18,11 @@ proj_fun <- function(x, proj_in, proj_out) {
 # proj_in = input projection (usually WGS84)
 # proj_out = what to project to (usually utm coords)
 
+
+
+##### CHANGE FEB 26 TO INCREASE BUFFER SIZE FROM 2 TO 3 AS COME ACROSS ERROR FOR 95%UD #####
+
+
 ### FUNCTION TO RESAMPLE HOME RANGE AREA WITH SAMPLE SIZE ####
 
 resampling_UD_area <- function(x, n_iter, iso_level, cellsize, h, proj_in, proj_out, n_core, verbose = TRUE) {
@@ -29,7 +34,7 @@ resampling_UD_area <- function(x, n_iter, iso_level, cellsize, h, proj_in, proj_
   if (verbose) start_time <- Sys.time()
   
   # 1. SETTING UP NULL GRID
-  buffer <- h * 2
+  buffer <- h * 3
   long_seq <- seq(min(x$longitude) - buffer, max(x$longitude) + buffer, by = cellsize)
   lat_seq <- seq(min(x$latitude) - buffer, max(x$latitude) + buffer, by = cellsize)
   null_grid <- expand.grid(x = long_seq, y = lat_seq)

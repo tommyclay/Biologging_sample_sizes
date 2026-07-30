@@ -18,6 +18,17 @@ all_preds <- data.frame(prediction = c(pred_gls$prediction, pred_br$prediction),
                         species = c(overlap_gls$species, pred_br$species), year = c(overlap_gls$year, rep("ALL", nrow(pred_br))),
                         device = c(rep("GLS", nrow(overlap_gls)), pred_br$device), stage = c(rep("NB", nrow(overlap_gls)), pred_br$stage))
 
+# # load in BL predictions
+# in_direx <- "./Data_outputs/"
+# pred_bl <- read.csv(paste0(in_direx, "birdlife_predictions_Jun26.csv"))
+# all_preds2 <- data.frame(prediction = c(pred_bl$Rep70, pred_bl$Rep95, all_preds$prediction),
+#                          ba = rep(all_preds$ba, 3), species = rep(all_preds$species, 3), 
+#                          species = rep(all_preds$species, 3), year = rep(all_preds$year, 3),
+#                          device = rep(all_preds$device, 3), stage = rep(all_preds$stage, 3),
+#                          method = rep(c("Inclusion70", "Inclusion95", "Area Occupied"), each = nrow(all_preds)))
+# 
+
+
 # setting up function and predicting onto dummy dataset
 # editing function from function codes to not round up numbers to predict to - see functions.R code
 prediction_from_ba_woround <- function(ba) {
@@ -54,7 +65,7 @@ oppel$prediction <- oppel_pred$prediction
 all_preds$Species <- all_preds$species
 all_preds$Device <- all_preds$device
 
-p1 <- ggplot() + geom_point(data = all_preds, aes(x = ba, y = prediction, colour = Species, shape = Device)) + 
+p1 <- ggplot() + geom_point(data = all_preds, aes(x = ba, y = prediction,colour = Species, shape = Device)) + 
   geom_ribbon(data = pred_df, aes(x = ba, ymin = lower, ymax = upper), alpha = 0.3, fill = "grey50") +
   geom_line(data = pred_df, aes(x = ba, y = prediction)) + theme_bw() + xlab("BA overlap") + ylab("Minimum sample size") +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1))+
@@ -64,10 +75,10 @@ p1 <- ggplot() + geom_point(data = all_preds, aes(x = ba, y = prediction, colour
         legend.title = element_text(size = 11), legend.text = element_text(size = 9),
         legend.margin = margin(0,0,0,0, unit="cm"),
         legend.key.size = unit(0.45, "cm")) +
-  scale_colour_manual(values = c("AP" = "#D55E00", "BBA" = "#E69F00", "BP" = "#F0E442",
-                                 "BS" = "#009E73", "GHA" = "#56B4E9", "LMA" = "#0072B2",
-                                 "NGP" = "#CC79A7", "SGP" = "#882255",
-                                 "WA" = "#000000", "WCP" = "grey60")) +
+   scale_colour_manual(values = c("AP" = "#D55E00", "BBA" = "#E69F00", "BP" = "#F0E442",
+                                  "BS" = "#009E73", "GHA" = "#56B4E9", "LMA" = "#0072B2",
+                                  "NGP" = "#CC79A7", "SGP" = "#882255",
+                                  "WA" = "#000000", "WCP" = "grey60")) +
   geom_hline(yintercept=1, linetype="dashed")
 p1
 
@@ -80,28 +91,39 @@ dev.off()
 
 oppel$family <- factor(oppel$family, levels = c("Phalacrocoracidae", "Laridae",  "Alcidae", "Sulidae", "Spheniscidae", "Hydrobatidae",
                                           "Phaethontidae", "Procellariidae", "Fregatidae", "Diomedeidae"))
+# just show the following as red dots:
+# black-browed albatross–incubation–PTT
+# black-browed albatross–chick-rearing–PTT
+# grey-headed albatross–incubation–PTT
+# grey-headed albatross–chick-rearing–PTT
+# wandering albatross–incubation–GPS
+# wandering albatross–chick-rearing–GPS
+sp <- c("Diomedea exulans", "Thalassarche chrysostoma", "Thalassarche melanophris")
+oppel_sub <- subset(oppel, species %in% sp,)
 
-p2 <- ggplot(oppel, aes(family, ba)) + geom_boxplot() + theme_bw() +
+p2 <- ggplot() + geom_boxplot(data = oppel, aes(x = family, y = ba)) + theme_bw() +
+  geom_point(data = oppel_sub, aes(x = family, y = ba), col = "red", size = 0.9) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
   axis.text.x = element_text(angle = 90, size = 14, vjust = 0.6),
   axis.text.y = element_text(size = 14)) +
   scale_y_continuous(limits = c(0,1), breaks= seq(0,1, 0.2))
 p2
 
-out.name <- paste0(plot_direx, "5b_oppel2018_ba.png")
+out.name <- paste0(plot_direx, "5b_oppel2018_ba_jun26.png")
 ggsave(out.name, dpi = 600, width = 2000, height = 2500, units = "px")
 dev.off()
 
 
 ##### PANEL C. HISTOGRAMS OF PREDICTED SAMPLE SIZE #####
 
-p3 <- ggplot(oppel, aes(family, prediction)) + geom_boxplot() + theme_bw() +
+p3 <- ggplot() + geom_boxplot(data = oppel, aes(x = family, y = prediction)) +  theme_bw() +
+  geom_point(data = oppel_sub, aes(x = family, y = prediction), col = "red", size = 0.9) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         axis.text.x = element_text(angle = 90, size = 14, vjust = 0.6),
         axis.text.y = element_text(size = 14)) +
   scale_y_continuous(limits = c(0,65), breaks= seq(0,60, 10))
 p3
 
-out.name <- paste0(plot_direx, "5c_oppel2018_predictions.png")
+out.name <- paste0(plot_direx, "5c_oppel2018_predictions_jun26.png")
 ggsave(out.name, dpi = 600, width = 2000, height = 2500, units = "px")
 dev.off()

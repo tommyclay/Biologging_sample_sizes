@@ -13,6 +13,7 @@ proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 #### 2. FOR EACH DATASET = LOAD IN DATA, CONVERT TO KERNEL AND RUN REPRESENTATIVENESS CODE ####
 
+
 iter = 1000
 iso = 50
 h = 186000
