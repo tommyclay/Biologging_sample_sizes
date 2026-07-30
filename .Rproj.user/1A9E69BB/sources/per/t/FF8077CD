@@ -1,0 +1,26 @@
+{
+    "id": "FF8077CD",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/1_predicting_minimum_sample_sizes/functions.R",
+    "project_path": "Codes/1_predicting_minimum_sample_sizes/functions.R",
+    "type": "r_source",
+    "hash": "1873120933",
+    "contents": "",
+    "dirty": false,
+    "created": 1785419078165.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "148,4",
+        "scrollLine": "121"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1785420242,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1785420245912,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,26 @@
+{
+    "id": "9CD56789",
+    "path": "~/GitHub/Biologging_sample_sizes/Codes/2_reproducing_analyses/2d_testing_og_sample_size_on_predictions.R",
+    "project_path": "Codes/2_reproducing_analyses/2d_testing_og_sample_size_on_predictions.R",
+    "type": "r_source",
+    "hash": "1547996572",
+    "contents": "",
+    "dirty": false,
+    "created": 1785418997543.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "103,0",
+        "scrollLine": "97"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1785418648,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1785418648,
+    "read_only": false,
+    "read_only_alternatives": []
+}

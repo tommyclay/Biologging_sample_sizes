@@ -38,7 +38,7 @@ proj_utm <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +uni
 proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
 
 
-#### 3. RANDOMLY SAMPLE DATASETS AT DIFFERENT SAMPLE SIZE INTERVALS AND RUN RESAMPLING CODE  - DON'T PASTE OUT FOR NOW ####
+#### 3. RANDOMLY SAMPLE DATASETS AT DIFFERENT SAMPLE SIZE INTERVALS AND RUN RESAMPLING CODE - DON'T PASTE OUT FOR NOW ####
 
 # set seed
 set.seed(512)

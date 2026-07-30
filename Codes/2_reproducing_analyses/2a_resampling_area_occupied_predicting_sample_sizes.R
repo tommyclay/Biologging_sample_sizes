@@ -34,7 +34,7 @@ proj_utm <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +uni
 proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
 
 
-#### 3. RESAMPLING AND PASTING OUT DATASETS - JUST FOR GEOLOCATOR DATASETS AND DO NOT PASTE OUT FOR NOW ####
+#### 3. RESAMPLING AND PASTING OUT DATASETS (JUST GLS DATASETS)  ####
 
 # output directory
 out_direx <- "./Data_outputs/resampled_area_outputs/gls_data/"
@@ -47,6 +47,7 @@ for (i in 1:length(f)) {
                                 proj_out = proj_utm, n_core = 6)
   # pasting out 50% UD iterations
   out_name <- paste0(out_direx, in_df[[i]]$species[1], substr(in_df[[i]]$year[1], 3, 4), "_", "50.csv")
+  # do not paste out for now
   #write.csv(res_50, out_name)
   # resampling 95% UD
   res_95 <- resampling_UD_area(x = in_df[[i]], n_iter = 1000, 
@@ -54,12 +55,12 @@ for (i in 1:length(f)) {
                                 proj_out = proj_utm, n_core = 6)
   # pasting out 95% UD iterations
   out_name <- paste0(out_direx, in_df[[i]]$species[1], substr(in_df[[i]]$year[1], 3, 4), "_", "95.csv")
+  # do not paste out for now
   #write.csv(res_95, out_name)
 }
 
 
-#### 4. RUN ASYMPTOTIC MODELS, COMPARE AIC AND PREDICT MINIMUM SAMPLE SIZES FOR A RANGE OF POP SIZES ####
-
+#### 4. RUN ASYMPTOTIC MODELS (ALL DATASETS), COMPARE AIC AND PREDICT MINIMUM SAMPLE SIZES FOR A RANGE OF POP SIZES ####
 
 pops <- c(100, 1000, 10000, 100000, 1000000)
 
@@ -110,7 +111,7 @@ for (i in 1:length(f_50)) {
 all_aics_50 <- do.call(rbind, out_aics_50)
 all_preds_50 <- do.call(rbind, out_preds_50)
 
-# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
+# paste out AICs and minimum sample sizes - though don't paste out for now
 out_name <- paste0(out_direx, "area_occupied_50_aics.csv")
 #write.csv(all_aics_50, out_name)
 out_name <- paste0(out_direx, "area_occupied_50_predictions.csv")
@@ -124,7 +125,7 @@ aic_best
 nrow(aic_best[aic_best$model == "MM3",])
 # 13 of 21 have MM3 as best model
 
-# pasting out MM3 models for each dataset - - DON'T PASTE OUT FOR NOW
+# pasting out MM3 models for each dataset - though don't paste out for now
 out_mod <- "./Data_outputs/resampled_area_outputs/gls_models/"
 for (i in 1:length(f_50)) {
   out_name <- paste0(out_mod, gsub(".csv", "", f_50[i]), ".RData")
@@ -180,7 +181,7 @@ for (i in 1:length(f_95)) {
 all_aics_95 <- do.call(rbind, out_aics_95)
 all_preds_95 <- do.call(rbind, out_preds_95)
 
-# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
+# paste out AICs and minimum sample sizes - though don't paste out for now
 out_name <- paste0(out_direx, "area_occupied_95_aics.csv")
 #write.csv(all_aics_95, out_name)
 out_name <- paste0(out_direx, "area_occupied_95_predictions.csv")
@@ -193,7 +194,6 @@ aic_best <- all_aics_95 %>%
 aic_best
 nrow(aic_best[aic_best$model == "MM3",])
 # 18 of 21 have MM3 as best model
-
 
 
 
@@ -247,7 +247,7 @@ for (i in 1:length(f_50)) {
 all_aics_50 <- do.call(rbind, out_aics_50)
 all_preds_50 <- do.call(rbind, out_preds_50)
 
-# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
+# paste out AICs and minimum sample sizes - though don't paste out for now
 out_name <- paste0(out_direx, "gps+ptt_area_occupied_50_aics.csv")
 #write.csv(all_aics_50, out_name)
 out_name <- paste0(out_direx, "gps+ptt_area_occupied_50_predictions.csv")
@@ -259,10 +259,10 @@ aic_best <- all_aics_50 %>%
   slice_min(AIC)
 aic_best
 nrow(aic_best[aic_best$model == "MM3",])
-# 13 of 21 have MM3 as best model
+# 10 of 11 have MM3 as best model
 
-# pasting out MM3 models for each dataset - - DON'T PASTE OUT FOR NOW
-out_mod <- "./Data_outputs/resampled_area_outputs/gls_models/"
+# pasting out MM3 models for each dataset - though don't paste out for now
+out_mod <- "./Data_outputs/resampled_area_outputs/gps+ptt_models/"
 for (i in 1:length(f_50)) {
   out_name <- paste0(out_mod, gsub(".csv", "", f_50[i]), ".RData")
   mod <- mod_mm3_50[[i]]
@@ -318,7 +318,7 @@ for (i in 1:length(f_95)) {
 all_aics_95 <- do.call(rbind, out_aics_95)
 all_preds_95 <- do.call(rbind, out_preds_95)
 
-# paste out AICs and minimum sample sizes - DON'T PASTE OUT FOR NOW
+# paste out AICs and minimum sample sizes - though don't paste out for now
 out_name <- paste0(out_direx, "gps+ptt_area_occupied_95_aics.csv")
 #write.csv(all_aics_95, out_name)
 out_name <- paste0(out_direx, "gps+ptt_area_occupied_95_predictions.csv")
@@ -330,4 +330,4 @@ aic_best <- all_aics_95 %>%
   slice_min(AIC)
 aic_best
 nrow(aic_best[aic_best$model == "MM3",])
-# 18 of 21 have MM3 as best model
+# 11 of 11 have MM3 as best model

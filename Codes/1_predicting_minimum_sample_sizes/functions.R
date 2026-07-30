@@ -19,10 +19,6 @@ proj_fun <- function(x, proj_in, proj_out) {
 # proj_out = what to project to (usually utm coords)
 
 
-
-##### CHANGE FEB 26 TO INCREASE BUFFER SIZE FROM 2 TO 3 AS COME ACROSS ERROR FOR 95%UD #####
-
-
 ### FUNCTION TO RESAMPLE HOME RANGE AREA WITH SAMPLE SIZE ####
 
 resampling_UD_area <- function(x, n_iter, iso_level, cellsize, h, proj_in, proj_out, n_core, verbose = TRUE) {
@@ -143,15 +139,15 @@ run_asymptotic_model <- function(dat, type) {
   
   # Try fitting the model, handle errors
   tryCatch({
-    # Extract the max sample area
-    a <- dat$area[dat$x == max(dat$x)][1]
-    # Calculate median areas
-    dat_med <- ddply(dat, .(x), summarize, med_area = median(area, na.rm = TRUE))
-    dat_med <- na.omit(dat_med)
-    # Find closest x value to half of max area
-    b <- dat$x[which.min(abs(dat_med$med_area - a / 2))]
+    # Remove invalid observations:
+    dat2 <- subset(dat, is.finite(area) & is.finite(x) & x >= 0)
+    # specifying starting values
+    c_start <- mean(dat2$area[dat2$x == min(dat2$x)], na.rm = TRUE)
+    a_start <- max(dat2$area, na.rm = TRUE)
+    half <- c_start + 0.5 * (a_start - c_start)
+    b_start <- dat2$x[which.min(abs(dat2$area - half))]
     # Define starting values
-    start <- if (type %in% c("MM2", "AR2")) c(a, b) else c(0, a, b)
+    start <- if (type %in% c("MM2", "AR2")) c(a_start, b_start) else c(c_start, a_start, b_start)
     # Retry fitting model with starting values
     mod <- drm(area ~ x, data = dat, fct = fun_form, start = start)
   }, error = function(e2) {

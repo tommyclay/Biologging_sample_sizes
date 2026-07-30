@@ -32,8 +32,7 @@ pred3 <- rbind(p3_50, p3_95)
 
 # 4. 50% UD area occupued versus representativeness based on inclusion
 # incorporating birdlife predictions
-#pred_bl <- read.csv(paste0(in_direx, "birdlife_predictions.csv"))
-pred_bl <- read.csv(paste0(in_direx, "birdlife_predictions_Jun26.csv"))
+pred_bl <- read.csv(paste0(in_direx, "birdlife_predictions.csv"))
 pred4 <- data.frame(prediction = c(pred_bl$Rep70, pred_bl$Rep95, p3_50$prediction),
                     method = rep(c("Inclusion70", "Inclusion95", "Area Occupied"), each = length(pred_bl$Rep70)),
                     dataset = rep(pred_bl$Dataset, 3))

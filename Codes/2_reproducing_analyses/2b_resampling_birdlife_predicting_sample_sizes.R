@@ -11,7 +11,7 @@ proj_utm <- "+proj=laea +lat_0=-90 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +uni
 proj_dec <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"   
 
 
-#### 2. FOR EACH DATASET = LOAD IN DATA, CONVERT TO KERNEL AND RUN REPRESENTATIVENESS CODE ####
+#### 2. FOR EACH DATASET (JUST GLS DATA FOR NOW) = LOAD IN DATA, CONVERT TO KERNEL AND RUN REPRESENTATIVENESS CODE ####
 
 
 iter = 1000
